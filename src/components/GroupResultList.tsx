@@ -177,7 +177,42 @@ const GroupResultList: React.FC = () => {
 
   return (
     <>
-      <div className="overflow-x-auto">
+      {/* Cards for mobile */}
+      <div className="block sm:hidden space-y-4">
+        {results.map((result) => (
+          <div key={result._id} className="bg-white rounded-lg shadow border border-gray-100 p-4 flex flex-col gap-2 animate-fade-in">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <div className="text-base font-bold text-gray-900">{result.eventName}</div>
+                <div className="text-xs text-blue-600 font-medium">{result.category?.name || 'Unknown'}</div>
+                <div className="text-xs text-gray-500">{new Date(result.eventDate).toLocaleDateString()}</div>
+              </div>
+              <div className="flex flex-col gap-1 items-end">
+                <button onClick={() => openEditModal(result._id)} className="inline-flex items-center p-2 bg-blue-100 hover:bg-blue-200 rounded-md transition-colors text-xs" title="Edit Result"><Edit2 className="w-4 h-4 mr-1" /> Edit</button>
+                <button onClick={() => deleteResult(result._id)} className="inline-flex items-center p-2 bg-red-100 hover:bg-red-200 rounded-md transition-colors text-xs" title="Delete Result"><Trash2 className="w-4 h-4 mr-1" /> Delete</button>
+                <button onClick={() => handleDownloadCertificate(result)} className="inline-flex items-center p-2 bg-green-100 hover:bg-green-200 rounded-md transition-colors text-xs" title="Download Certificate"><Download className="w-4 h-4 mr-1" /> Certificate</button>
+              </div>
+            </div>
+            <div>
+              <div className="font-semibold text-xs text-gray-700 mb-1">Group Results</div>
+              <div className="flex flex-col gap-1">
+                {['first', 'second', 'third'].map((place, idx) => {
+                  const pos = result.group && result.group[place as keyof typeof result.group];
+                  return pos && pos.name ? (
+                    <div key={place} className="flex items-center gap-1 text-[11px]">
+                      <span className={["text-yellow-600", "text-gray-600", "text-orange-600"][idx]}>{["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][idx]}</span>
+                      <span className="font-medium">{pos.name}</span>
+                      {pos.details && <span className="text-gray-400">({pos.details})</span>}
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* Table for tablet/desktop */}
+      <div className="overflow-x-auto w-full hidden sm:block">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-3 gap-2">
           <h2 className="text-xl font-bold text-gray-900">Group Event Results</h2>
         </div>
@@ -202,9 +237,7 @@ const GroupResultList: React.FC = () => {
                     const pos = result.group && result.group[place as keyof typeof result.group];
                     return pos && pos.name ? (
                       <div key={place} className="flex items-center gap-1 text-xs">
-                        <span className={["text-yellow-600", "text-gray-600", "text-orange-600"][idx]}>
-                          {["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][idx]}
-                        </span>
+                        <span className={["text-yellow-600", "text-gray-600", "text-orange-600"][idx]}>{["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][idx]}</span>
                         <span className="font-medium">{pos.name}</span>
                         {pos.details && <span className="text-gray-400">({pos.details})</span>}
                       </div>
@@ -212,15 +245,9 @@ const GroupResultList: React.FC = () => {
                   })}
                 </td>
                 <td className="px-3 py-2 text-center">
-                  <button onClick={() => openEditModal(result._id)} className="inline-flex items-center px-2 py-1 text-xs text-blue-600 hover:text-blue-800">
-                    <Edit2 className="w-4 h-4 mr-1" /> Edit
-                  </button>
-                  <button onClick={() => deleteResult(result._id)} className="inline-flex items-center px-2 py-1 text-xs text-red-600 hover:text-red-800">
-                    <Trash2 className="w-4 h-4 mr-1" /> Delete
-                  </button>
-                  <button onClick={() => handleDownloadCertificate(result)} className="inline-flex items-center px-2 py-1 text-xs text-green-600 hover:text-green-800">
-                    <Download className="w-4 h-4 mr-1" /> Certificate
-                  </button>
+                  <button onClick={() => openEditModal(result._id)} className="inline-flex items-center px-2 py-1 text-xs text-blue-600 hover:text-blue-800"><Edit2 className="w-4 h-4 mr-1" /> Edit</button>
+                  <button onClick={() => deleteResult(result._id)} className="inline-flex items-center px-2 py-1 text-xs text-red-600 hover:text-red-800"><Trash2 className="w-4 h-4 mr-1" /> Delete</button>
+                  <button onClick={() => handleDownloadCertificate(result)} className="inline-flex items-center px-2 py-1 text-xs text-green-600 hover:text-green-800"><Download className="w-4 h-4 mr-1" /> Certificate</button>
                 </td>
               </tr>
             ))}
