@@ -8,7 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ className = '', children, ...props }, ref) => (
   <button
     ref={ref}
-    className={`transition-all duration-150 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 ${className}`}
+    className={`transition-all duration-150 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 ripple animate-bounce-in ${className}`}
     {...props}
   >
     {children}

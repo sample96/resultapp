@@ -45,7 +45,7 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
               const pos = result.individual && result.individual[place as keyof typeof result.individual];
               return pos && pos.name ? (
                 <li key={place} className="flex items-center gap-2 justify-center text-base mb-1">
-                  <span className={["text-yellow-600", "text-gray-600", "text-orange-600"][idx]}>
+                  <span className={["text-blue-600", "text-green-600", "text-red-600"][idx]}>
                     {["🥇", "🥈", "🥉"][idx]}
                   </span>
                   <span className="font-medium">{pos.name}</span>
@@ -66,7 +66,7 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
               const pos = result.group && result.group[place as keyof typeof result.group];
               return pos && pos.name ? (
                 <li key={place} className="flex items-center gap-2 justify-center text-base mb-1">
-                  <span className={["text-yellow-600", "text-gray-600", "text-orange-600"][idx]}>
+                  <span className={["text-blue-600", "text-green-600", "text-red-600"][idx]}>
                     {["🥇", "🥈", "🥉"][idx]}
                   </span>
                   <span className="font-medium">{pos.name}</span>

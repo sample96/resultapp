@@ -225,7 +225,7 @@ const ResultList: React.FC = () => {
                   const pos = result.individual && result.individual[place as keyof typeof result.individual];
                   return pos && pos.name ? (
                     <div key={place} className="flex items-center gap-1 text-[11px]">
-                      <span className={["text-yellow-600", "text-gray-600", "text-orange-600"][idx]}>{["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][idx]}</span>
+                      <span className={["text-blue-600", "text-green-600", "text-red-600"][idx]}>{["🥇", "🥈", "🥉"][idx]}</span>
                       <span className="font-medium">{pos.name}</span>
                       {pos.details && <span className="text-gray-400">({pos.details})</span>}
                     </div>
@@ -240,7 +240,7 @@ const ResultList: React.FC = () => {
                   const pos = result.group && result.group[place as keyof typeof result.group];
                   return pos && pos.name ? (
                     <div key={place} className="flex items-center gap-1 text-[11px]">
-                      <span className={["text-yellow-600", "text-gray-600", "text-orange-600"][idx]}>{["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][idx]}</span>
+                      <span className={["text-blue-600", "text-green-600", "text-red-600"][idx]}>{["🥇", "🥈", "🥉"][idx]}</span>
                       <span className="font-medium">{pos.name}</span>
                       {pos.details && <span className="text-gray-400">({pos.details})</span>}
                     </div>
@@ -278,7 +278,7 @@ const ResultList: React.FC = () => {
                     const pos = result.individual && result.individual[place as keyof typeof result.individual];
                     return pos && pos.name ? (
                       <div key={place} className="flex items-center gap-1 text-[10px] sm:text-xs">
-                        <span className={["text-yellow-600", "text-gray-600", "text-orange-600"][idx]}>{["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][idx]}</span>
+                        <span className={["text-blue-600", "text-green-600", "text-red-600"][idx]}>{["🥇", "🥈", "🥉"][idx]}</span>
                         <span className="font-medium">{pos.name}</span>
                         {pos.details && <span className="text-gray-400">({pos.details})</span>}
                       </div>
@@ -290,7 +290,7 @@ const ResultList: React.FC = () => {
                     const pos = result.group && result.group[place as keyof typeof result.group];
                     return pos && pos.name ? (
                       <div key={place} className="flex items-center gap-1 text-[10px] sm:text-xs">
-                        <span className={["text-yellow-600", "text-gray-600", "text-orange-600"][idx]}>{["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][idx]}</span>
+                        <span className={["text-blue-600", "text-green-600", "text-red-600"][idx]}>{["🥇", "🥈", "🥉"][idx]}</span>
                         <span className="font-medium">{pos.name}</span>
                         {pos.details && <span className="text-gray-400">({pos.details})</span>}
                       </div>

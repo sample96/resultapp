@@ -2,48 +2,63 @@ import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import ResultManager from './components/ResultManager';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import ResultForm from './components/ResultForm';
 import IndividualResultList from './components/IndividualResultList';
 import GroupResultList from './components/GroupResultList';
 import CategoryManager from './components/CategoryManager';
 
 const Categories = () => (
-  <div className="bg-white rounded-md shadow p-6 text-center text-gray-700 font-medium">Categories page coming soon.</div>
+  <div className="bg-white/80 rounded-3xl shadow-sm border border-gray-100/50 p-6 sm:p-8 text-center text-gray-700 font-medium text-lg backdrop-blur-sm">
+    Categories page coming soon.
+  </div>
 );
-// const Profile = () => (
-//   <div className="bg-white rounded-md shadow p-6 text-center text-gray-700 font-medium">Profile page coming soon.</div>
-// );
 
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col md:flex-row transition-all duration-300">
+    <div className="min-h-screen bg-gray-50 flex flex-col transition-all duration-300">
+      {/* Navbar for mobile only */}
+      <div className="md:hidden sticky top-0 z-60 bg-white/95 border-b border-gray-100/50 shadow-sm backdrop-blur-sm">
+        <Navbar />
+      </div>
       {/* Sidebar for desktop */}
-      <aside className="hidden md:block w-64 bg-white border-r border-gray-100 shadow-lg min-h-screen animate-fade-in sticky top-0 z-40">
+      <aside className="hidden md:block w-64 bg-white/95 border-r border-gray-100/50 shadow-lg min-h-screen sticky top-0 z-40 backdrop-blur-sm">
         <div className="p-6">
-          <div className="text-2xl font-extrabold text-blue-600 mb-8 tracking-tight">ResultApp</div>
-          <nav className="flex flex-col gap-4">
-            <a href="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Results</a>
-            <a href="/individual-results" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Individual Results</a>
-            <a href="/group-results" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Group Results</a>
-            <a href="/categories" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Categories</a>
-            <a href="/add-result" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Add Result</a>
+          <div className="text-2xl sm:text-3xl font-extrabold text-blue-600 mb-8 tracking-tight flex items-center gap-2">
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">ResultApp</span>
+          </div>
+          <nav className="flex flex-col gap-3">
+            {[
+              { path: '/', label: 'Results' },
+              { path: '/individual-results', label: 'Individual Results' },
+              { path: '/group-results', label: 'Group Results' },
+              { path: '/categories', label: 'Categories' },
+              { path: '/add-result', label: 'Add Result' },
+            ].map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className="text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-lg hover:bg-blue-50/50 transition-all duration-200 text-sm sm:text-base"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </div>
       </aside>
       {/* Main content */}
       <div className="flex-1 flex flex-col">
-        {/* Navbar for mobile */}
-        <div className="md:hidden">
-          <Navbar />
-        </div>
-        <section className="bg-white border-b border-gray-100">
-          <div className="max-w-3xl mx-auto px-4 py-8 text-center">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 sm:mb-4 animate-fade-in">Event Result Manager</h1>
-            <p className="text-base sm:text-lg text-gray-500 max-w-xl mx-auto animate-fade-in">Manage and generate professional event results with individual and group categories</p>
+        <section className="bg-gradient-to-b from-gray-50 to-white border-b border-gray-100/50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 text-center">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 sm:mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent animate-fade-in">
+              Event Result Manager
+            </h1>
+            <p className="text-sm sm:text-lg text-gray-500 max-w-2xl mx-auto animate-fade-in">
+              Manage and generate professional event results with individual and group categories
+            </p>
           </div>
         </section>
-        <main className="max-w-3xl px-4 py-6 sm:py-10 animate-fade-in">
+        <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full">
           <Routes>
             <Route path="/" element={<ResultManager />} />
             <Route path="/categories" element={<CategoryManager />} />
@@ -57,12 +72,15 @@ function App() {
           toastOptions={{
             duration: 4000,
             style: {
-              background: '#363636',
+              background: '#2d3748',
               color: '#fff',
+              borderRadius: '1rem',
+              padding: '1rem',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
             },
             success: {
               iconTheme: {
-                primary: '#2563eb', // blue-600
+                primary: '#22c55e',
                 secondary: '#fff',
               },
             },
