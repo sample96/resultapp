@@ -31,9 +31,11 @@ interface ResultFormData {
 
 interface ResultFormProps {
   onSuccess: () => void;
+  onCancel?: () => void;
+  result?: any; // For edit mode
 }
 
-const ResultForm: React.FC<ResultFormProps> = ({ onSuccess }) => {
+const ResultForm: React.FC<ResultFormProps> = ({ onSuccess, onCancel, result }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<ResultFormData>({
@@ -50,7 +52,25 @@ const ResultForm: React.FC<ResultFormProps> = ({ onSuccess }) => {
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+    if (result) {
+      // Pre-fill form for edit
+      setFormData({
+        category: result.category?._id || '',
+        eventName: result.eventName || '',
+        eventDate: result.eventDate ? result.eventDate.slice(0, 10) : '',
+        resultType: result.individual && (result.individual.first?.name || result.individual.second?.name || result.individual.third?.name)
+          ? 'individual'
+          : 'group',
+        positions: result.individual && (result.individual.first?.name || result.individual.second?.name || result.individual.third?.name)
+          ? result.individual
+          : result.group || {
+              first: { name: '', details: '' },
+              second: { name: '', details: '' },
+              third: { name: '', details: '' }
+            }
+      });
+    }
+  }, [result]);
 
   const fetchCategories = async () => {
     try {
@@ -109,38 +129,43 @@ const ResultForm: React.FC<ResultFormProps> = ({ onSuccess }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!formData.category || !formData.eventName || !formData.eventDate) {
       toast.error('Please fill in all required fields');
       return;
     }
-
-    // Transform data to match the original API structure
+    // Helper to strip _id from positions
+    const stripIds = (positions: any) => {
+      if (!positions) return positions;
+      const clean = {} as any;
+      ['first', 'second', 'third'].forEach(pos => {
+        if (positions[pos]) {
+          const { _id, ...rest } = positions[pos];
+          clean[pos] = rest;
+        } else {
+          clean[pos] = { name: '', details: '' };
+        }
+      });
+      return clean;
+    };
     const submitData = {
       category: formData.category,
       eventName: formData.eventName,
       eventDate: formData.eventDate,
-      // individual: formData.resultType === 'individual' ? formData.positions : {
-      //   first: { name: '', details: '' },
-      //   second: { name: '', details: '' },
-      //   third: { name: '', details: '' }
-      // },
-      // group: formData.resultType === 'group' ? formData.positions : {
-      //   first: { name: '', details: '' },
-      //   second: { name: '', details: '' },
-      //   third: { name: '', details: '' }
-      // }
-      individual: formData.resultType === 'individual' ? formData.positions : null,
-    group: formData.resultType === 'group' ? formData.positions : null,
+      individual: formData.resultType === 'individual' ? stripIds(formData.positions) : null,
+      group: formData.resultType === 'group' ? stripIds(formData.positions) : null,
     };
-
     setLoading(true);
     try {
-      await api.post('/results', submitData);
-      toast.success('Result created successfully!');
+      if (result && result._id) {
+        await api.put(`/results/${result._id}`, submitData);
+        toast.success('Result updated successfully!');
+      } else {
+        await api.post('/results', submitData);
+        toast.success('Result created successfully!');
+      }
       onSuccess();
     } catch (error) {
-      toast.error('Failed to create result');
+      toast.error('Failed to save result');
     } finally {
       setLoading(false);
     }
@@ -152,69 +177,71 @@ const ResultForm: React.FC<ResultFormProps> = ({ onSuccess }) => {
   }));
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic Information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Category *
           </label>
           <CreatableSelect
             options={categoryOptions}
             onChange={handleCategoryChange}
+            value={categoryOptions.find(opt => opt.value === formData.category) || null}
             placeholder="Select or create a category..."
             formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
             classNames={{
-              control: () => 'border-gray-300 shadow-sm hover:border-gray-400 focus:border-blue-500',
+              control: () => 'border-gray-300 shadow-sm focus:border-blue-500',
               option: () => 'hover:bg-blue-50',
+            }}
+            styles={{
+              control: (base) => ({ ...base, minHeight: 44, borderRadius: 6 }),
+              menu: (base) => ({ ...base, zIndex: 50 }),
             }}
           />
         </div>
-
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Event Name *
           </label>
           <div className="relative">
-            <Trophy className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Trophy className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               value={formData.eventName}
               onChange={(e) => handleInputChange('eventName', e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               placeholder="Enter event name"
               required
             />
           </div>
         </div>
-
         <div className="md:col-span-2">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Event Date *
           </label>
           <div className="relative max-w-md">
-            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="date"
               value={formData.eventDate}
               onChange={(e) => handleInputChange('eventDate', e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               required
             />
           </div>
         </div>
       </div>
-
       {/* Result Type Selection */}
-      <div className="bg-gray-50 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Result Type</h3>
-        <div className="flex space-x-4">
+      <div className="bg-gray-50 rounded-md p-4">
+        <h3 className="text-base font-semibold text-gray-900 mb-3">Select Result Type</h3>
+        <div className="flex flex-col sm:flex-row gap-2">
           <button
             type="button"
             onClick={() => handleResultTypeChange('individual')}
-            className={`flex items-center px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex items-center justify-center px-4 py-2 rounded-md font-medium transition-all duration-150 w-full sm:w-auto ${
               formData.resultType === 'individual'
-                ? 'bg-blue-600 text-white shadow-lg transform scale-105'
+                ? 'bg-blue-600 text-white shadow'
                 : 'bg-white text-gray-700 border border-gray-300 hover:bg-blue-50'
             }`}
           >
@@ -224,10 +251,10 @@ const ResultForm: React.FC<ResultFormProps> = ({ onSuccess }) => {
           <button
             type="button"
             onClick={() => handleResultTypeChange('group')}
-            className={`flex items-center px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex items-center justify-center px-4 py-2 rounded-md font-medium transition-all duration-150 w-full sm:w-auto ${
               formData.resultType === 'group'
-                ? 'bg-green-600 text-white shadow-lg transform scale-105'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-green-50'
+                ? 'bg-blue-600 text-white shadow'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-blue-50'
             }`}
           >
             <Users className="w-5 h-5 mr-2" />
@@ -235,62 +262,66 @@ const ResultForm: React.FC<ResultFormProps> = ({ onSuccess }) => {
           </button>
         </div>
       </div>
-
       {/* Results Section */}
-      <div className={`${
-        formData.resultType === 'individual' ? 'bg-blue-50' : 'bg-green-50'
-      } rounded-xl p-6`}>
-        <div className="flex items-center mb-6">
+      <div className="bg-white rounded-md p-4 border border-gray-100">
+        <div className="flex items-center mb-4">
           {formData.resultType === 'individual' ? (
-            <User className="w-6 h-6 text-blue-600 mr-3" />
+            <User className="w-6 h-6 text-blue-600 mr-2" />
           ) : (
-            <Users className="w-6 h-6 text-green-600 mr-3" />
+            <Users className="w-6 h-6 text-blue-600 mr-2" />
           )}
-          <h3 className="text-xl font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-gray-900">
             {formData.resultType === 'individual' ? 'Individual' : 'Group'} Results
           </h3>
         </div>
-        
-        <div className="space-y-6">
+        <div className="space-y-4">
           {(['first', 'second', 'third'] as const).map((position, index) => (
-            <div key={position} className="bg-white rounded-lg p-4 shadow-sm">
-              <h4 className="font-semibold text-gray-700 mb-3 flex items-center">
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-sm mr-2 ${
+            <div key={position} className="bg-gray-50 rounded p-3 flex flex-col gap-2">
+              <h4 className="font-medium text-gray-700 flex items-center gap-2">
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs ${
                   index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : 'bg-orange-500'
                 }`}>
                   {index + 1}
                 </span>
                 {position.charAt(0).toUpperCase() + position.slice(1)} Place
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={formData.positions[position].name}
-                  onChange={(e) => handlePositionChange(position, 'name', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={formData.resultType === 'individual' ? 'Participant name' : 'Group/Team name'}
+                  onChange={e => handlePositionChange(position, 'name', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  placeholder="Name"
                 />
                 <input
                   type="text"
                   value={formData.positions[position].details}
-                  onChange={(e) => handlePositionChange(position, 'details', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Additional details (optional)"
+                  onChange={e => handlePositionChange(position, 'details', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  placeholder="Details (optional)"
                 />
               </div>
             </div>
           ))}
         </div>
       </div>
-
-      {/* Submit Button */}
-      <div className="flex justify-end">
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row gap-2 justify-end">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-100 transition-all duration-150 w-full sm:w-auto"
+          >
+            Cancel
+          </button>
+        )}
         <button
           type="submit"
           disabled={loading}
-          className="px-8 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none"
+          className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all duration-150 w-full sm:w-auto disabled:opacity-60"
         >
-          {loading ? 'Creating...' : `Create ${formData.resultType === 'individual' ? 'Individual' : 'Group'} Result`}
+          {loading ? 'Saving...' : result && result._id ? 'Update Result' : 'Create Result'}
         </button>
       </div>
     </form>
