@@ -12,6 +12,8 @@ const Navbar: React.FC = () => {
         </div>
         <div className="hidden md:flex gap-6 items-center">
           <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Results</Link>
+          <Link to="/individual-results" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Individual Results</Link>
+          <Link to="/group-results" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Group Results</Link>
           <Link to="/categories" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Categories</Link>
           <Link to="/add-result" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Add Result</Link>
         </div>
@@ -24,6 +26,8 @@ const Navbar: React.FC = () => {
       {open && (
         <div className="md:hidden bg-white border-t border-gray-100 px-4 pb-3 pt-2 flex flex-col gap-2">
           <Link to="/" onClick={handleNavClick} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Results</Link>
+          <Link to="/individual-results" onClick={handleNavClick} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Individual Results</Link>
+          <Link to="/group-results" onClick={handleNavClick} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Group Results</Link>
           <Link to="/categories" onClick={handleNavClick} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Categories</Link>
           <Link to="/add-result" onClick={handleNavClick} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">Add Result</Link>
         </div>

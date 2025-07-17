@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Plus, FileText } from 'lucide-react';
+import { Plus, FileText, Info } from 'lucide-react';
 import ResultForm from './ResultForm';
-import ResultList from './ResultList';
 
 interface ResultManagerProps {}
 
@@ -36,8 +35,13 @@ const ResultManager: React.FC<ResultManagerProps> = () => {
           <ResultForm onSuccess={handleResultCreated} />
         </div>
       )}
-      {/* Results List */}
-      <ResultList key={refreshTrigger} />
+      {/* Info Message */}
+      <div className="flex flex-col items-center justify-center bg-blue-50 border border-blue-100 rounded-lg p-6 mt-4">
+        <Info className="w-8 h-8 text-blue-400 mb-2" />
+        <p className="text-base text-blue-700 font-medium text-center">
+          To view results, use the navigation bar to access <span className="font-semibold">Individual Results</span> or <span className="font-semibold">Group Results</span>.
+        </p>
+      </div>
     </div>
   );
 };

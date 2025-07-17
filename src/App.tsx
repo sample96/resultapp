@@ -4,6 +4,9 @@ import Navbar from './components/Navbar';
 import ResultManager from './components/ResultManager';
 import { Routes, Route } from 'react-router-dom';
 import ResultForm from './components/ResultForm';
+import IndividualResultList from './components/IndividualResultList';
+import GroupResultList from './components/GroupResultList';
+import CategoryManager from './components/CategoryManager';
 
 const Categories = () => (
   <div className="bg-white rounded-md shadow p-6 text-center text-gray-700 font-medium">Categories page coming soon.</div>
@@ -25,8 +28,10 @@ function App() {
       <main className="max-w-3xl mx-auto px-4 py-6 sm:py-10">
         <Routes>
           <Route path="/" element={<ResultManager />} />
-          <Route path="/categories" element={<Categories />} />
+          <Route path="/categories" element={<CategoryManager />} />
           <Route path="/add-result" element={<ResultForm onSuccess={() => console.log('Form submitted successfully!')} />} />
+          <Route path="/individual-results" element={<IndividualResultList />} />
+          <Route path="/group-results" element={<GroupResultList />} />
         </Routes>
       </main>
       <Toaster 
