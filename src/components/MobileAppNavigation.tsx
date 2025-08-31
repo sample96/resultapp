@@ -1,6 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { 
+  Trophy, 
+  Tv, 
+  BarChart3, 
+  User, 
+  Users, 
+  FolderOpen, 
+  Settings, 
+  Search, 
+  Share2, 
+  Star, 
+  PieChart, 
+  Info, 
+  X, 
+  Plus,
+  Zap,
+  Compass
+} from 'lucide-react';
 
 const MobileAppNavigation: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -37,15 +55,15 @@ const MobileAppNavigation: React.FC = () => {
   }, [isMenuOpen]);
 
   const userNavigationItems = [
-    { path: '/user', label: 'Results', icon: '🏆', color: 'blue', description: 'View your results' },
-    { path: '/tv', label: 'TV Display', icon: '📺', color: 'purple', description: 'Live TV display' },
+    { path: '/user', label: 'Results', icon: Trophy, color: 'blue', description: 'View your results' },
+    { path: '/tv', label: 'TV Display', icon: Tv, color: 'purple', description: 'Live TV display' },
   ];
 
   const adminNavigationItems = [
-    { path: '/admin', label: 'Dashboard', icon: '📊', color: 'blue', description: 'Admin overview' },
-    { path: '/admin/individual-results', label: 'Individual', icon: '👤', color: 'green', description: 'Individual results' },
-    { path: '/admin/group-results', label: 'Group', icon: '👥', color: 'orange', description: 'Group results' },
-    { path: '/admin/categories', label: 'Categories', icon: '📂', color: 'purple', description: 'Manage categories' },
+    { path: '/admin', label: 'Dashboard', icon: BarChart3, color: 'blue', description: 'Admin overview' },
+    { path: '/admin/individual-results', label: 'Individual', icon: User, color: 'green', description: 'Individual results' },
+    { path: '/admin/group-results', label: 'Group', icon: Users, color: 'orange', description: 'Group results' },
+    { path: '/admin/categories', label: 'Categories', icon: FolderOpen, color: 'purple', description: 'Manage categories' },
   ];
 
   const navigationItems = isAdminRoute ? adminNavigationItems : userNavigationItems;
@@ -122,8 +140,8 @@ const MobileAppNavigation: React.FC = () => {
               }`}
               onClick={() => handleTabClick(index)}
             >
-              <span className="text-2xl mb-1 transition-transform duration-200">
-                {item.icon}
+              <span className="mb-1 transition-transform duration-200">
+                <item.icon className="w-6 h-6" />
               </span>
               <span className="text-xs font-medium">{item.label}</span>
               {activeTab === index && (
@@ -133,7 +151,7 @@ const MobileAppNavigation: React.FC = () => {
           ))}
           
           {/* Menu Button */}
-          <button
+          {/* <button
             onClick={toggleMenu}
             className={`mobile-nav-tab transition-all duration-300 ${
               isMenuOpen
@@ -141,14 +159,14 @@ const MobileAppNavigation: React.FC = () => {
                 : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50/50'
             }`}
           >
-            <span className="text-2xl mb-1 transition-transform duration-200">
-              {isMenuOpen ? '✕' : '⚙️'}
+            <span className="mb-1 transition-transform duration-200">
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Settings className="w-6 h-6" />}
             </span>
             <span className="text-xs font-medium">Menu</span>
             {isMenuOpen && (
               <div className="absolute -top-1 w-2 h-2 bg-purple-600 rounded-full animate-pulse" />
             )}
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -162,8 +180,8 @@ const MobileAppNavigation: React.FC = () => {
               : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-lg'
           }`}
         >
-          <span className="text-xl transition-transform duration-200">
-            {isMenuOpen ? '✕' : '➕'}
+          <span className="transition-transform duration-200">
+            {isMenuOpen ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           </span>
         </button>
       </div>
@@ -212,23 +230,24 @@ const MobileAppNavigation: React.FC = () => {
           {/* Quick Actions */}
           <div className="mb-6">
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <span>⚡</span> Quick Actions
+              <Zap className="w-4 h-4" />
+              Quick Actions
             </h4>
             <div className="grid grid-cols-2 gap-3">
               <button className="flex flex-col items-center p-4 bg-blue-50 rounded-2xl hover:bg-blue-100 transition-all duration-200 hover:scale-105">
-                <span className="text-2xl mb-2">🔍</span>
+                <Search className="w-6 h-6 mb-2 text-blue-600" />
                 <span className="text-sm font-medium text-blue-700">Search</span>
               </button>
               <button className="flex flex-col items-center p-4 bg-green-50 rounded-2xl hover:bg-green-100 transition-all duration-200 hover:scale-105">
-                <span className="text-2xl mb-2">📱</span>
+                <Share2 className="w-6 h-6 mb-2 text-green-600" />
                 <span className="text-sm font-medium text-green-700">Share</span>
               </button>
               <button className="flex flex-col items-center p-4 bg-purple-50 rounded-2xl hover:bg-purple-100 transition-all duration-200 hover:scale-105">
-                <span className="text-2xl mb-2">⭐</span>
+                <Star className="w-6 h-6 mb-2 text-purple-600" />
                 <span className="text-sm font-medium text-purple-700">Favorites</span>
               </button>
               <button className="flex flex-col items-center p-4 bg-orange-50 rounded-2xl hover:bg-orange-100 transition-all duration-200 hover:scale-105">
-                <span className="text-2xl mb-2">📊</span>
+                <PieChart className="w-6 h-6 mb-2 text-orange-600" />
                 <span className="text-sm font-medium text-orange-700">Stats</span>
               </button>
             </div>
@@ -237,7 +256,8 @@ const MobileAppNavigation: React.FC = () => {
           {/* Navigation Links */}
           <div className="mb-6">
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <span>🧭</span> Navigation
+              <Compass className="w-4 h-4" />
+              Navigation
             </h4>
             <div className="space-y-2">
               {navigationItems.map((item) => (
@@ -252,7 +272,7 @@ const MobileAppNavigation: React.FC = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-r ${getGradientClasses(item.color)} shadow-sm`}>
-                    <span className="text-lg">{item.icon}</span>
+                    <item.icon className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{item.label}</p>
@@ -270,7 +290,7 @@ const MobileAppNavigation: React.FC = () => {
           <div className="space-y-2">
             <button className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 transition-all duration-200 hover:scale-105 w-full">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-gray-500 to-gray-600 flex items-center justify-center shadow-sm">
-                <span className="text-lg">⚙️</span>
+                <Settings className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 text-left">
                 <p className="font-medium text-gray-900">Settings</p>
@@ -280,7 +300,7 @@ const MobileAppNavigation: React.FC = () => {
             
             <button className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 transition-all duration-200 hover:scale-105 w-full">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-gray-500 to-gray-600 flex items-center justify-center shadow-sm">
-                <span className="text-lg">ℹ️</span>
+                <Info className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 text-left">
                 <p className="font-medium text-gray-900">About</p>

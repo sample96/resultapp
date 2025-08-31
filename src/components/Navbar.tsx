@@ -1,21 +1,22 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Trophy, Tv, BarChart3, User, Users, FolderOpen } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   const { isAdminRoute, isUserRoute } = useAuth();
 
   const userNavigationItems = [
-    { path: '/user', label: 'Results', icon: '🏆' },
-    { path: '/tv', label: 'TV Display', icon: '📺' },
+    { path: '/user', label: 'Results', icon: Trophy },
+    { path: '/tv', label: 'TV Display', icon: Tv },
   ];
 
   const adminNavigationItems = [
-    { path: '/admin', label: 'Dashboard', icon: '📊' },
-    { path: '/admin/individual-results', label: 'Individual Results', icon: '👤' },
-    { path: '/admin/group-results', label: 'Group Results', icon: '👥' },
-    { path: '/admin/categories', label: 'Categories', icon: '📂' },
+    { path: '/admin', label: 'Dashboard', icon: BarChart3 },
+    { path: '/admin/individual-results', label: 'Individual Results', icon: User },
+    { path: '/admin/group-results', label: 'Group Results', icon: Users },
+    { path: '/admin/categories', label: 'Categories', icon: FolderOpen },
   ];
 
   const navigationItems = isAdminRoute ? adminNavigationItems : userNavigationItems;
@@ -64,7 +65,7 @@ const Navbar: React.FC = () => {
                   : 'text-gray-700 hover:text-blue-600 after:absolute after:left-0 after:-bottom-1 after:w-full after:h-0.5 after:bg-gradient-to-r after:from-blue-600 after:to-indigo-600 after:rounded-full after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform'
               }`}
             >
-              <span>{item.icon}</span>
+              <item.icon className="w-4 h-4" />
               {item.label}
             </Link>
           ))}
