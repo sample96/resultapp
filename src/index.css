@@ -78,4 +78,182 @@
     from { opacity: 0; transform: translateY(40px) scale(0.98); }
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
+  
+  /* Mobile-first responsive utilities */
+  .mobile-container {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  .mobile-card {
+    @apply bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 p-4 sm:p-6;
+  }
+  
+  .mobile-button {
+    @apply px-4 py-3 sm:px-6 sm:py-3 text-sm sm:text-base font-medium rounded-xl transition-all duration-200;
+  }
+  
+  .mobile-input {
+    @apply w-full px-4 py-3 sm:py-4 text-sm sm:text-base rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+  
+  .mobile-text {
+    @apply text-sm sm:text-base;
+  }
+  
+  .mobile-heading {
+    @apply text-xl sm:text-2xl lg:text-3xl font-bold;
+  }
+  
+  .mobile-subheading {
+    @apply text-lg sm:text-xl font-semibold;
+  }
+  
+  /* Touch-friendly interactions */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Improved mobile navigation */
+  .mobile-nav-item {
+    @apply flex items-center gap-3 py-4 px-4 rounded-xl transition-all duration-200 touch-target;
+  }
+  
+  /* Mobile-optimized spacing */
+  .mobile-space-y {
+    @apply space-y-4 sm:space-y-6;
+  }
+  
+  .mobile-gap {
+    @apply gap-3 sm:gap-4;
+  }
+  
+  /* Mobile grid layouts */
+  .mobile-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6;
+  }
+  
+  /* Mobile-friendly modals */
+  .mobile-modal {
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm;
+  }
+  
+  .mobile-modal-content {
+    @apply bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto;
+  }
+  
+  /* Mobile tab navigation */
+  .mobile-tabs {
+    @apply flex bg-gray-100/50 rounded-xl p-1;
+  }
+  
+  .mobile-tab {
+    @apply flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-all duration-200 touch-target;
+  }
+  
+  /* Mobile search bar */
+  .mobile-search {
+    @apply relative w-full;
+  }
+  
+  .mobile-search-input {
+    @apply w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+  
+  /* Mobile result cards */
+  .mobile-result-card {
+    @apply bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 p-4 sm:p-6 hover:shadow-md transition-all duration-200;
+  }
+  
+  /* Mobile status badges */
+  .mobile-badge {
+    @apply px-2 py-1 rounded-full text-xs font-medium;
+  }
+  
+  /* Mobile loading states */
+  .mobile-loading {
+    @apply flex items-center justify-center py-12;
+  }
+  
+  .mobile-spinner {
+    @apply animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600;
+  }
+  
+  /* Mobile empty states */
+  .mobile-empty {
+    @apply bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 p-8 text-center;
+  }
+  
+  /* Mobile certificate preview */
+  .mobile-certificate-preview {
+    @apply bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto;
+  }
+  
+  /* Mobile action buttons */
+  .mobile-action-button {
+    @apply flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 touch-target;
+  }
+  
+  /* Mobile responsive text */
+  .mobile-responsive-text {
+    @apply text-sm sm:text-base lg:text-lg;
+  }
+  
+  /* Mobile responsive padding */
+  .mobile-responsive-padding {
+    @apply p-4 sm:p-6 lg:p-8;
+  }
+  
+  /* Mobile responsive margin */
+  .mobile-responsive-margin {
+    @apply m-4 sm:m-6 lg:m-8;
+  }
+  
+  /* Confetti Animation */
+  .confetti {
+    animation: confetti-fall 3s linear infinite;
+  }
+  
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(-10px) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+  
+  /* Certificate specific animations */
+  .certificate-glow {
+    animation: certificateGlow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes certificateGlow {
+    from {
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+    to {
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+    }
+  }
+  
+  .medal-shine {
+    animation: medalShine 2s ease-in-out infinite;
+  }
+  
+  @keyframes medalShine {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    }
+  }
 }

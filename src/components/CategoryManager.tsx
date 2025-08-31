@@ -84,7 +84,7 @@ const CategoryManager: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Categories</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Mawlid Categories</h2>
         <button
           onClick={openAddModal}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all duration-150"
@@ -98,7 +98,7 @@ const CategoryManager: React.FC = () => {
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
           </div>
         ) : categories.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">No categories found.</div>
+          <div className="text-center py-8 text-gray-400">No Mawlid categories found.</div>
         ) : (
           <table className="min-w-full text-sm">
             <thead className="bg-gray-100">

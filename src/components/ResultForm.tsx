@@ -211,7 +211,7 @@ const ResultForm: React.FC<ResultFormProps> = ({ onSuccess, onCancel, result }) 
               value={formData.eventName}
               onChange={(e) => handleInputChange('eventName', e.target.value)}
               className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-              placeholder="Enter event name"
+              placeholder="Enter Mawlid event name"
               required
             />
           </div>

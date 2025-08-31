@@ -330,8 +330,8 @@ const IndividualResultList: React.FC = () => {
     <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 sm:p-8 text-white">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Individual Event Results</h1>
-        <p className="text-blue-100 text-sm sm:text-base">Manage and view all your individual event results</p>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Individual Mawlid Results</h1>
+        <p className="text-blue-100 text-sm sm:text-base">Manage and view all your individual Mawlid event results</p>
       </div>
 
       {/* Cards for mobile */}
@@ -423,9 +423,9 @@ const IndividualResultList: React.FC = () => {
           <div className="w-16 h-16 mx-auto mb-4 bg-gray-100/50 rounded-full flex items-center justify-center">
             <User className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Individual Results Found</h3>
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Individual Mawlid Results Found</h3>
           <p className="text-gray-500 text-sm sm:text-base max-w-md mx-auto">
-            Create your first individual event result to get started!
+            Create your first individual Mawlid event result to get started!
           </p>
         </div>
       )}

@@ -348,8 +348,8 @@ const GroupResultList: React.FC = () => {
     <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 sm:p-8 text-white">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Group Event Results</h1>
-        <p className="text-blue-100 text-sm sm:text-base">Manage and view all your group event results</p>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Group Mawlid Results</h1>
+        <p className="text-blue-100 text-sm sm:text-base">Manage and view all your group Mawlid event results</p>
       </div>
 
       {/* Search and Filters */}
@@ -359,7 +359,7 @@ const GroupResultList: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search events..."
+              placeholder="Search Mawlid events..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-gray-200/50 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
@@ -397,11 +397,11 @@ const GroupResultList: React.FC = () => {
           <div className="w-16 h-16 mx-auto mb-4 bg-gray-100/50 rounded-full flex items-center justify-center">
             <Users className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Group Results Found</h3>
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Group Mawlid Results Found</h3>
           <p className="text-gray-500 text-sm sm:text-base max-w-md mx-auto">
             {searchTerm || selectedCategory !== 'all' 
               ? 'Try adjusting your search or filter criteria'
-              : 'Create your first group event result to get started!'
+              : 'Create your first group Mawlid event result to get started!'
             }
           </p>
         </div>
