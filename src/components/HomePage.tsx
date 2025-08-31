@@ -155,7 +155,7 @@ const HomePage: React.FC = () => {
         <div className="px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-gray-900">Mawlid Results</h1>
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <button
                 onClick={() => setViewMode('mobile')}
                 className={`p-2 rounded-lg transition-colors duration-200 ${
@@ -172,10 +172,10 @@ const HomePage: React.FC = () => {
               >
                 <Monitor className="w-5 h-5" />
               </button>
-            </div>
+            </div> */}
           </div>
           
-          {/* Tab Navigation */}
+         
           <div className="flex bg-gray-100/50 rounded-xl p-1">
             <button
               onClick={() => setActiveTab('individual')}

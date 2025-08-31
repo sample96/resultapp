@@ -33,16 +33,17 @@ interface ResultFormProps {
   onSuccess: () => void;
   onCancel?: () => void;
   result?: any; // For edit mode
+  forcedResultType?: ResultType; // Force a specific result type (hides tab selection)
 }
 
-const ResultForm: React.FC<ResultFormProps> = ({ onSuccess, onCancel, result }) => {
+const ResultForm: React.FC<ResultFormProps> = ({ onSuccess, onCancel, result, forcedResultType }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<ResultFormData>({
     category: '',
     eventName: '',
     eventDate: '',
-    resultType: 'individual',
+    resultType: forcedResultType || 'individual',
     positions: {
       first: { name: '', details: '' },
       second: { name: '', details: '' },
@@ -69,8 +70,14 @@ const ResultForm: React.FC<ResultFormProps> = ({ onSuccess, onCancel, result }) 
               third: { name: '', details: '' }
             }
       });
+    } else if (forcedResultType) {
+      // Set the forced result type for new forms
+      setFormData(prev => ({
+        ...prev,
+        resultType: forcedResultType
+      }));
     }
-  }, [result]);
+  }, [result, forcedResultType]);
 
   const fetchCategories = async () => {
     try {
@@ -178,6 +185,24 @@ const ResultForm: React.FC<ResultFormProps> = ({ onSuccess, onCancel, result }) 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Forced Result Type Indicator */}
+      {forcedResultType && (
+        <div className={`bg-${forcedResultType === 'individual' ? 'blue' : 'green'}-50 border border-${forcedResultType === 'individual' ? 'blue' : 'green'}-200 rounded-md p-4`}>
+          <div className="flex items-center gap-2">
+            {forcedResultType === 'individual' ? (
+              <User className="w-5 h-5 text-blue-600" />
+            ) : (
+              <Users className="w-5 h-5 text-green-600" />
+            )}
+            <h3 className="text-base font-semibold text-gray-900">
+              Creating {forcedResultType === 'individual' ? 'Individual' : 'Group'} Result
+            </h3>
+          </div>
+          <p className="text-sm text-gray-600 mt-1">
+            This form is specifically for {forcedResultType === 'individual' ? 'individual' : 'group'} results only.
+          </p>
+        </div>
+      )}
       {/* Basic Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -232,36 +257,38 @@ const ResultForm: React.FC<ResultFormProps> = ({ onSuccess, onCancel, result }) 
           </div>
         </div>
       </div>
-      {/* Result Type Selection */}
-      <div className="bg-gray-50 rounded-md p-4">
-        <h3 className="text-base font-semibold text-gray-900 mb-3">Select Result Type</h3>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <button
-            type="button"
-            onClick={() => handleResultTypeChange('individual')}
-            className={`flex items-center justify-center px-4 py-2 rounded-md font-medium transition-all duration-150 w-full sm:w-auto ${
-              formData.resultType === 'individual'
-                ? 'bg-blue-600 text-white shadow'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-blue-50'
-            }`}
-          >
-            <User className="w-5 h-5 mr-2" />
-            Individual Results
-          </button>
-          <button
-            type="button"
-            onClick={() => handleResultTypeChange('group')}
-            className={`flex items-center justify-center px-4 py-2 rounded-md font-medium transition-all duration-150 w-full sm:w-auto ${
-              formData.resultType === 'group'
-                ? 'bg-blue-600 text-white shadow'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-blue-50'
-            }`}
-          >
-            <Users className="w-5 h-5 mr-2" />
-            Group Results
-          </button>
+      {/* Result Type Selection - Only show if not forced */}
+      {!forcedResultType && (
+        <div className="bg-gray-50 rounded-md p-4">
+          <h3 className="text-base font-semibold text-gray-900 mb-3">Select Result Type</h3>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              onClick={() => handleResultTypeChange('individual')}
+              className={`flex items-center justify-center px-4 py-2 rounded-md font-medium transition-all duration-150 w-full sm:w-auto ${
+                formData.resultType === 'individual'
+                  ? 'bg-blue-600 text-white shadow'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-blue-50'
+              }`}
+            >
+              <User className="w-5 h-5 mr-2" />
+              Individual Results
+            </button>
+            <button
+              type="button"
+              onClick={() => handleResultTypeChange('group')}
+              className={`flex items-center justify-center px-4 py-2 rounded-md font-medium transition-all duration-150 w-full sm:w-auto ${
+                formData.resultType === 'group'
+                  ? 'bg-blue-600 text-white shadow'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-blue-50'
+              }`}
+            >
+              <Users className="w-5 h-5 mr-2" />
+              Group Results
+            </button>
+          </div>
         </div>
-      </div>
+      )}
       {/* Results Section */}
       <div className="bg-white rounded-md p-4 border border-gray-100">
         <div className="flex items-center mb-4">

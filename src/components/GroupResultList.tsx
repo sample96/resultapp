@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Edit2, Trash2, Calendar, Users, Award, Search, Filter, SortAsc, Eye, X } from 'lucide-react';
+import { Download, Edit2, Trash2, Calendar, Users, Award, Search, Filter, SortAsc, Eye, X, RefreshCw, ChevronDown, ChevronUp, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '../services/api';
 import ResultForm from './ResultForm';
@@ -40,11 +40,15 @@ const GroupResultList: React.FC = () => {
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
   const [editResult, setEditResult] = useState<Result | null>(null);
+  const [addResult, setAddResult] = useState<boolean>(false);
   const [certificateResult, setCertificateResult] = useState<ResultType | null>(null);
   const [downloading, setDownloading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('date');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showFilters, setShowFilters] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [showPreview, setShowPreview] = useState<string | null>(null);
   const certificateRef = useRef<HTMLDivElement | null>(null);
 
@@ -54,6 +58,7 @@ const GroupResultList: React.FC = () => {
 
   const fetchResults = async () => {
     try {
+      setRefreshing(true);
       const response = await api.get('/results');
       setResults(response.data.filter((r: Result) => r.group && (
         r.group.first?.name || r.group.second?.name || r.group.third?.name
@@ -62,6 +67,7 @@ const GroupResultList: React.FC = () => {
       toast.error('Failed to fetch results');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -85,8 +91,17 @@ const GroupResultList: React.FC = () => {
 
   const closeEditModal = () => setEditResult(null);
 
+  const openAddModal = () => setAddResult(true);
+
+  const closeAddModal = () => setAddResult(false);
+
   const handleEditSuccess = () => {
     closeEditModal();
+    fetchResults();
+  };
+
+  const handleAddSuccess = () => {
+    closeAddModal();
     fetchResults();
   };
 
@@ -186,37 +201,45 @@ const GroupResultList: React.FC = () => {
     return colors[rank] || 'bg-gray-50/50';
   };
 
-  const ResultCard = ({ result }: { result: Result }) => (
-    <div className="group bg-white/80 rounded-2xl shadow-sm border border-gray-100/50 hover:shadow-xl hover:border-blue-200/50 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden backdrop-blur-sm w-full max-w-md lg:max-w-lg mx-auto">
+  const getRankBorder = (rank: number) => {
+    const colors = ['border-amber-200/50', 'border-gray-200/50', 'border-orange-200/50'];
+    return colors[rank] || 'border-gray-200/50';
+  };
+
+  // Mobile Card Component
+  const MobileResultCard = ({ result }: { result: Result }) => (
+    <div className="group bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 hover:shadow-xl hover:border-blue-200/50 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden animate-fade-in-up">
       <div className="relative">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-        <div className="p-6 sm:p-7">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500"></div>
+        <div className="p-4 sm:p-6">
+          {/* Header */}
           <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-green-600 transition-colors duration-200 line-clamp-2">
                 {result.eventName}
               </h3>
               <div className="flex items-center gap-2 mt-2 flex-wrap">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-medium bg-blue-100/80 text-blue-800 backdrop-blur-sm">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100/80 text-green-800 backdrop-blur-sm">
                   {result.category?.name || 'Unknown'}
                 </span>
-                <span className="inline-flex items-center gap-1 text-xs sm:text-sm text-gray-500">
-                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                  <Calendar className="w-3 h-3" />
                   {new Date(result.eventDate).toLocaleDateString()}
                 </span>
               </div>
             </div>
             <button
               onClick={() => setShowPreview(result._id)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 hover:bg-gray-100/50 rounded-lg"
+              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 hover:bg-gray-100/50 rounded-lg touch-target"
             >
-              <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              <Eye className="w-4 h-4 text-gray-600" />
             </button>
           </div>
 
+          {/* Results Section */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-sm sm:text-base font-semibold text-gray-800">
-              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+              <Users className="w-4 h-4 text-green-500" />
               Group Results
             </div>
             
@@ -224,15 +247,15 @@ const GroupResultList: React.FC = () => {
               {['first', 'second', 'third'].map((place, idx) => {
                 const pos = result.group && result.group[place as keyof typeof result.group];
                 return pos && pos.name ? (
-                  <div key={place} className={`flex items-center gap-3 p-3 sm:p-4 rounded-lg ${getRankBg(idx)} hover:bg-opacity-80 transition-all duration-200`}>
+                  <div key={place} className={`flex items-center gap-3 p-3 rounded-lg ${getRankBg(idx)} ${getRankBorder(idx)} border hover:bg-opacity-80 transition-all duration-200`}>
                     <div className="flex items-center gap-2">
-                      <span className="text-xl sm:text-2xl">{["🥇", "🥈", "🥉"][idx]}</span>
-                      <span className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                      <span className="text-xl">{["🥇", "🥈", "🥉"][idx]}</span>
+                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {place}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className={`font-semibold ${getRankColor(idx)} text-sm sm:text-base truncate`}>
+                      <div className={`font-semibold ${getRankColor(idx)} text-sm truncate`}>
                         {pos.name}
                       </div>
                       {pos.details && (
@@ -247,26 +270,27 @@ const GroupResultList: React.FC = () => {
             </div>
           </div>
 
+          {/* Action Buttons */}
           <div className="flex items-center gap-2 mt-6 pt-4 border-t border-gray-100/50">
             <button
               onClick={() => openEditModal(result._id)}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm sm:text-base font-medium text-blue-600 bg-blue-50/50 hover:bg-blue-100/50 rounded-lg transition-all duration-200"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50/50 hover:bg-blue-100/50 rounded-lg transition-all duration-200 touch-target"
             >
-              <Edit2 className="w-4 h-4 sm:w-5 sm:h-5" />
-              Edit
+              <Edit2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Edit</span>
             </button>
             <button
               onClick={() => handleDownloadCertificate(result)}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm sm:text-base font-medium text-green-600 bg-green-50/50 hover:bg-green-100/50 rounded-lg transition-all duration-200"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50/50 hover:bg-green-100/50 rounded-lg transition-all duration-200 touch-target"
             >
-              <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-              Certificate
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Certificate</span>
             </button>
             <button
               onClick={() => deleteResult(result._id)}
-              className="inline-flex items-center justify-center p-2 text-red-600 hover:bg-red-50/50 rounded-lg transition-all duration-200"
+              className="inline-flex items-center justify-center p-2 text-red-600 hover:bg-red-50/50 rounded-lg transition-all duration-200 touch-target"
             >
-              <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -274,14 +298,185 @@ const GroupResultList: React.FC = () => {
     </div>
   );
 
+  // Desktop Card Component
+  const DesktopResultCard = ({ result }: { result: Result }) => (
+    <div className="group bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 hover:shadow-xl hover:border-green-200/50 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden animate-fade-in-up">
+      <div className="relative">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500"></div>
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-gray-900 group-hover:text-green-600 transition-colors duration-200 line-clamp-2">
+                {result.eventName}
+              </h3>
+              <div className="flex items-center gap-3 mt-3">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100/80 text-green-800 backdrop-blur-sm">
+                  {result.category?.name || 'Unknown'}
+                </span>
+                <span className="inline-flex items-center gap-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  {new Date(result.eventDate).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowPreview(result._id)}
+              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 hover:bg-gray-100/50 rounded-lg"
+            >
+              <Eye className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+
+          {/* Results Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 text-base font-semibold text-gray-800">
+              <Users className="w-5 h-5 text-green-500" />
+              Group Results
+            </div>
+            
+            <div className="grid grid-cols-1 gap-3">
+              {['first', 'second', 'third'].map((place, idx) => {
+                const pos = result.group && result.group[place as keyof typeof result.group];
+                return pos && pos.name ? (
+                  <div key={place} className={`flex items-center gap-4 p-4 rounded-xl ${getRankBg(idx)} ${getRankBorder(idx)} border hover:bg-opacity-80 transition-all duration-200`}>
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{["🥇", "🥈", "🥉"][idx]}</span>
+                      <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+                        {place}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className={`font-semibold ${getRankColor(idx)} text-base`}>
+                        {pos.name}
+                      </div>
+                      {pos.details && (
+                        <div className="text-sm text-gray-500 mt-1">
+                          {pos.details}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : null;
+              })}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3 mt-8 pt-6 border-t border-gray-100/50">
+            <button
+              onClick={() => openEditModal(result._id)}
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-blue-600 bg-blue-50/50 hover:bg-blue-100/50 rounded-lg transition-all duration-200"
+            >
+              <Edit2 className="w-4 h-4" />
+              Edit
+            </button>
+            <button
+              onClick={() => handleDownloadCertificate(result)}
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-green-600 bg-green-50/50 hover:bg-green-100/50 rounded-lg transition-all duration-200"
+            >
+              <Download className="w-4 h-4" />
+              Certificate
+            </button>
+            <button
+              onClick={() => deleteResult(result._id)}
+              className="inline-flex items-center justify-center p-2.5 text-red-600 hover:bg-red-50/50 rounded-lg transition-all duration-200"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Desktop Table Component
+  const DesktopTable = () => (
+    <div className="hidden lg:block overflow-x-auto w-full">
+      <table className="min-w-full bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 text-sm">
+        <thead className="bg-gradient-to-r from-green-50/50 to-emerald-50/50 text-gray-800 sticky top-0 z-10">
+          <tr>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Event Name</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Category</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Date</th>
+            <th className="px-6 py-4 text-left font-semibold whitespace-nowrap">Group Results</th>
+            <th className="px-6 py-4 text-center font-semibold whitespace-nowrap">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredResults.map((result, index) => (
+            <tr key={result._id} className={`border-b border-gray-100/50 last:border-b-0 hover:bg-green-50/50 transition-all duration-200 animate-fade-in-up`} style={{ animationDelay: `${index * 0.1}s` }}>
+              <td className="px-6 py-4 font-semibold text-gray-900">{result.eventName}</td>
+              <td className="px-6 py-4">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100/80 text-green-800 backdrop-blur-sm">
+                  {result.category?.name || 'Unknown'}
+                </span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">{new Date(result.eventDate).toLocaleDateString()}</td>
+              <td className="px-6 py-4">
+                <div className="space-y-2">
+                  {['first', 'second', 'third'].map((place, idx) => {
+                    const pos = result.group && result.group[place as keyof typeof result.group];
+                    return pos && pos.name ? (
+                      <div key={place} className={`flex items-center gap-3 p-3 rounded-lg ${getRankBg(idx)} ${getRankBorder(idx)} border`}>
+                        <span className="text-lg">{["🥇", "🥈", "🥉"][idx]}</span>
+                        <div className="flex-1">
+                          <div className={`font-semibold ${getRankColor(idx)} text-sm`}>{pos.name}</div>
+                          {pos.details && <div className="text-xs text-gray-500">{pos.details}</div>}
+                        </div>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => setShowPreview(result._id)}
+                    className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-50/50 hover:bg-gray-100/50 rounded-lg transition-all duration-200"
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    View
+                  </button>
+                  <button
+                    onClick={() => openEditModal(result._id)}
+                    className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50/50 hover:bg-blue-100/50 rounded-lg transition-all duration-200"
+                  >
+                    <Edit2 className="w-4 h-4 mr-1" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDownloadCertificate(result)}
+                    className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-600 bg-green-50/50 hover:bg-green-100/50 rounded-lg transition-all duration-200"
+                  >
+                    <Download className="w-4 h-4 mr-1" />
+                    Certificate
+                  </button>
+                  <button
+                    onClick={() => deleteResult(result._id)}
+                    className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50/50 hover:bg-red-100/50 rounded-lg transition-all duration-200"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  // Result Preview Modal
   const ResultPreview = ({ result }: { result: Result }) => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 animate-scale-in">
         <div className="flex items-center justify-between p-6 sm:p-8 border-b border-gray-100/50 sticky top-0 bg-white/95 backdrop-blur-sm">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Event Details</h2>
           <button
             onClick={() => setShowPreview(null)}
-            className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-200"
+            className="p-2 hover:bg-gray-100/50 rounded-full transition-all duration-200 touch-target"
           >
             <X className="w-5 h-5 text-gray-600" />
           </button>
@@ -293,7 +488,7 @@ const GroupResultList: React.FC = () => {
               <h3 className="text-lg sm:text-xl font-bold text-gray-900">{result.eventName}</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                  <Award className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                   <span className="text-sm sm:text-base text-gray-600">Category: {result.category?.name || 'Unknown'}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -303,9 +498,9 @@ const GroupResultList: React.FC = () => {
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 rounded-2xl p-5 sm:p-6">
+            <div className="bg-gradient-to-br from-green-50/50 to-emerald-50/50 rounded-2xl p-5 sm:p-6">
               <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2 text-base sm:text-lg">
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                 Group Results
               </h4>
               <div className="space-y-3">
@@ -338,79 +533,206 @@ const GroupResultList: React.FC = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 min-h-[50vh]">
-        <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-blue-600 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-green-600 border-t-transparent"></div>
         <p className="mt-4 text-gray-600 font-medium text-sm sm:text-base">Loading results...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto animate-fade-in">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 sm:p-8 text-white">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Group Mawlid Results</h1>
-        <p className="text-blue-100 text-sm sm:text-base">Manage and view all your group Mawlid event results</p>
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-3xl p-6 sm:p-8 text-white animate-fade-in-up">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Group Mawlid Results</h1>
+            <p className="text-green-100 text-sm sm:text-base">Manage and view all your group Mawlid event results</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={openAddModal}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200 touch-target"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Add Result</span>
+            </button>
+            <button
+              onClick={fetchResults}
+              disabled={refreshing}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200 touch-target"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+            <div className="hidden sm:flex items-center gap-2 bg-white/20 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                  viewMode === 'grid' ? 'bg-white text-green-600' : 'text-white hover:bg-white/20'
+                }`}
+              >
+                Grid
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                  viewMode === 'list' ? 'bg-white text-green-600' : 'text-white hover:bg-white/20'
+                }`}
+              >
+                List
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white/80 rounded-2xl shadow-sm border border-gray-100/50 p-5 sm:p-6 backdrop-blur-sm">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 p-4 sm:p-6 animate-fade-in-up">
+        <div className="flex flex-col gap-4">
+          {/* Search Bar */}
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
             <input
               type="text"
               placeholder="Search Mawlid events..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-gray-200/50 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
+              className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm sm:text-base"
             />
           </div>
           
-          <div className="flex gap-3">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2.5 sm:py-3 border border-gray-200/50 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm sm:text-base"
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center justify-between sm:justify-start gap-2 px-4 py-3 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm sm:text-base"
             >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Categories' : cat}
-                </option>
-              ))}
-            </select>
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4" />
+                <span>Filters</span>
+              </div>
+              {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
             
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2.5 sm:py-3 border border-gray-200/50 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm sm:text-base"
-            >
-              <option value="date">Sort by Date</option>
-              <option value="name">Sort by Name</option>
-            </select>
+            {showFilters && (
+              <div className="flex flex-col sm:flex-row gap-3 sm:ml-4">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="px-4 py-3 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm sm:text-base"
+                >
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>
+                      {cat === 'all' ? 'All Categories' : cat}
+                    </option>
+                  ))}
+                </select>
+                
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-4 py-3 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm sm:text-base"
+                >
+                  <option value="date">Sort by Date</option>
+                  <option value="name">Sort by Name</option>
+                </select>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
+      {/* Results Count */}
+      {filteredResults.length > 0 && (
+        <div className="flex items-center justify-between bg-white/95 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/50 p-4 animate-fade-in-up">
+          <p className="text-sm sm:text-base text-gray-600">
+            Showing <span className="font-semibold text-gray-900">{filteredResults.length}</span> of <span className="font-semibold text-gray-900">{results.length}</span> results
+          </p>
+          <div className="flex items-center gap-2 sm:hidden">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded-lg transition-all duration-200 ${
+                viewMode === 'grid' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              <div className="grid grid-cols-2 gap-0.5 w-4 h-4">
+                <div className="bg-current rounded-sm"></div>
+                <div className="bg-current rounded-sm"></div>
+                <div className="bg-current rounded-sm"></div>
+                <div className="bg-current rounded-sm"></div>
+              </div>
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded-lg transition-all duration-200 ${
+                viewMode === 'list' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              <div className="space-y-0.5 w-4 h-4">
+                <div className="bg-current rounded-sm h-0.5"></div>
+                <div className="bg-current rounded-sm h-0.5"></div>
+                <div className="bg-current rounded-sm h-0.5"></div>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Results */}
       {filteredResults.length === 0 ? (
-        <div className="text-center py-20 bg-white/80 rounded-2xl shadow-sm border border-gray-100/50 backdrop-blur-sm">
+        <div className="text-center py-20 bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 animate-fade-in-up">
           <div className="w-16 h-16 mx-auto mb-4 bg-gray-100/50 rounded-full flex items-center justify-center">
             <Users className="w-8 h-8 text-gray-400" />
           </div>
           <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Group Mawlid Results Found</h3>
-          <p className="text-gray-500 text-sm sm:text-base max-w-md mx-auto">
+          <p className="text-gray-500 text-sm sm:text-base max-w-md mx-auto mb-6">
             {searchTerm || selectedCategory !== 'all' 
               ? 'Try adjusting your search or filter criteria'
               : 'Create your first group Mawlid event result to get started!'
             }
           </p>
+          {!searchTerm && selectedCategory === 'all' && (
+            <button
+              onClick={openAddModal}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-200 touch-target"
+            >
+              <Plus className="w-5 h-5" />
+              Add Your First Result
+            </button>
+          )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
-          {filteredResults.map((result) => (
-            <ResultCard key={result._id} result={result} />
-          ))}
-        </div>
+        <>
+          {/* Mobile Grid View */}
+          <div className="block lg:hidden">
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                {filteredResults.map((result, index) => (
+                  <MobileResultCard key={result._id} result={result} />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredResults.map((result, index) => (
+                  <MobileResultCard key={result._id} result={result} />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop View */}
+          <div className="hidden lg:block">
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
+                {filteredResults.map((result, index) => (
+                  <DesktopResultCard key={result._id} result={result} />
+                ))}
+              </div>
+            ) : (
+              <DesktopTable />
+            )}
+          </div>
+        </>
       )}
 
       {/* Preview Modal */}
@@ -421,10 +743,10 @@ const GroupResultList: React.FC = () => {
       {/* Edit Modal */}
       {editResult && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 relative">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 relative animate-scale-in">
             <button 
               onClick={closeEditModal} 
-              className="absolute top-4 right-4 p-2 hover:bg-gray-100/50 rounded-full transition-all duration-200 z-10"
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100/50 rounded-full transition-all duration-200 z-10 touch-target"
             >
               <X className="w-5 h-5 text-gray-600" />
             </button>
@@ -440,13 +762,35 @@ const GroupResultList: React.FC = () => {
         </div>
       )}
 
+      {/* Add Modal */}
+      {addResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 relative animate-scale-in">
+            <button 
+              onClick={closeAddModal} 
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100/50 rounded-full transition-all duration-200 z-10 touch-target"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+            <div className="p-6 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Add New Group Result</h2>
+              <ResultForm 
+                onSuccess={handleAddSuccess} 
+                onCancel={closeAddModal}
+                forcedResultType="group"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Certificate Modal */}
       {certificateResult && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 relative">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 relative animate-scale-in">
             <button 
               onClick={handleCloseCertificate} 
-              className="absolute top-4 right-4 p-2 hover:bg-gray-100/50 rounded-full transition-all duration-200 z-10"
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100/50 rounded-full transition-all duration-200 z-10 touch-target"
             >
               <X className="w-5 h-5 text-gray-600" />
             </button>
@@ -458,7 +802,7 @@ const GroupResultList: React.FC = () => {
               <button
                 onClick={handleExportImage}
                 disabled={downloading}
-                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 touch-target"
               >
                 {downloading ? 'Downloading...' : 'Download as Image'}
               </button>
@@ -466,6 +810,15 @@ const GroupResultList: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Floating Action Button for Mobile */}
+      <button
+        onClick={openAddModal}
+        className="fixed bottom-6 right-6 z-40 lg:hidden w-14 h-14 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 flex items-center justify-center touch-target"
+        aria-label="Add new result"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
     </div>
   );
 };

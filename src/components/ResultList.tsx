@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Edit2, Trash2 } from 'lucide-react';
+import { Download, Edit2, Trash2, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '../services/api';
 import ResultForm from './ResultForm';
@@ -41,6 +41,7 @@ const ResultList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState<string | null>(null);
   const [editResult, setEditResult] = useState<Result | null>(null);
+  const [addResult, setAddResult] = useState<boolean>(false);
   const [certificateResult, setCertificateResult] = useState<ResultType | null>(null);
   const [downloading, setDownloading] = useState(false);
   const certificateRef = useRef<HTMLDivElement | null>(null);
@@ -80,8 +81,17 @@ const ResultList: React.FC = () => {
 
   const closeEditModal = () => setEditResult(null);
 
+  const openAddModal = () => setAddResult(true);
+
+  const closeAddModal = () => setAddResult(false);
+
   const handleEditSuccess = () => {
     closeEditModal();
+    fetchResults();
+  };
+
+  const handleAddSuccess = () => {
+    closeAddModal();
     fetchResults();
   };
 
@@ -195,7 +205,14 @@ const ResultList: React.FC = () => {
     return (
       <div className="text-center py-10">
         <h3 className="text-lg font-semibold text-gray-500 mb-1">No Results Yet</h3>
-        <p className="text-gray-400 text-sm">Create your first event result to get started!</p>
+        <p className="text-gray-400 text-sm mb-4">Create your first event result to get started!</p>
+        <button
+          onClick={openAddModal}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-all duration-150"
+        >
+          <Plus className="w-4 h-4" />
+          Add Your First Result
+        </button>
       </div>
     );
   }
@@ -255,6 +272,13 @@ const ResultList: React.FC = () => {
       <div className="overflow-x-auto w-full hidden sm:block">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-3 gap-2">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900">Event Results</h2>
+          <button
+            onClick={openAddModal}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-all duration-150"
+          >
+            <Plus className="w-4 h-4" />
+            Add Result
+          </button>
         </div>
         <table className="min-w-[600px] w-full bg-white rounded-md shadow border border-gray-100 text-xs sm:text-sm">
           <thead className="bg-gray-100 text-gray-700">
@@ -317,6 +341,17 @@ const ResultList: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Add Modal */}
+      {addResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-md shadow-lg p-6 w-full max-w-md relative overflow-y-auto max-h-[90vh]">
+            <button onClick={closeAddModal} className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+            <h2 className="text-lg font-bold mb-4 text-gray-900">Add New Result</h2>
+            <ResultForm onSuccess={handleAddSuccess} onCancel={closeAddModal} />
+          </div>
+        </div>
+      )}
       {/* Certificate Modal rendered at root for html2canvas reliability */}
       {certificateResult && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -335,6 +370,15 @@ const ResultList: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Floating Action Button for Mobile */}
+      <button
+        onClick={openAddModal}
+        className="fixed bottom-6 right-6 z-40 sm:hidden w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all duration-200 flex items-center justify-center"
+        aria-label="Add new result"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
     </>
   );
 };

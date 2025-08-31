@@ -52,19 +52,19 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-pink-50">
       {/* Header */}
-      <div className="bg-white/95 backdrop-blur-sm border-b border-gray-100/50 shadow-sm sticky top-0 z-40">
+      <div className="bg-white/95 backdrop-blur-sm border-b border-gray-100/50 shadow-sm sticky top-0 z-0">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
                 <img 
-                  src="/logo.png" 
+                  src="/logo2.jpeg" 
                   alt="ResultApp Logo" 
                   className="w-12 h-12 rounded-xl shadow-sm bg-black p-1"
                 />
-                <div className="p-3 bg-red-100 rounded-xl">
+                {/* <div className="p-3 bg-red-100 rounded-xl">
                   <Shield className="w-8 h-8 text-red-600" />
-                </div>
+                </div> */}
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
