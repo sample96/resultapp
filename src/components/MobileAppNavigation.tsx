@@ -60,7 +60,7 @@ const MobileAppNavigation: React.FC = () => {
   ];
 
   const adminNavigationItems = [
-    { path: '/admin', label: 'Dashboard', icon: BarChart3, color: 'blue', description: 'Admin overview' },
+    // { path: '/admin', label: 'Dashboard', icon: BarChart3, color: 'blue', description: 'Admin overview' },
     { path: '/admin/individual-results', label: 'Individual', icon: User, color: 'green', description: 'Individual results' },
     { path: '/admin/group-results', label: 'Group', icon: Users, color: 'orange', description: 'Group results' },
     { path: '/admin/categories', label: 'Categories', icon: FolderOpen, color: 'purple', description: 'Manage categories' },
@@ -171,7 +171,7 @@ const MobileAppNavigation: React.FC = () => {
       </div>
 
       {/* Floating Action Button */}
-      <div className="fixed bottom-20 right-4 z-40 lg:hidden">
+      {/* <div className="fixed bottom-20 right-4 z-40 lg:hidden">
         <button
           onClick={toggleMenu}
           className={`fab transition-all duration-300 ${
@@ -184,7 +184,7 @@ const MobileAppNavigation: React.FC = () => {
             {isMenuOpen ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           </span>
         </button>
-      </div>
+      </div> */}
 
       {/* Slide-up Menu Overlay */}
       {isMenuOpen && (
