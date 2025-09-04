@@ -20,8 +20,8 @@ interface Position {
 interface Result {
   _id: string;
   category: Category;
-  eventName: string;
-  eventDate: string;
+  eventName?: string;
+  eventDate?: string;
   individual: {
     first: Position;
     second: Position;
@@ -161,7 +161,7 @@ const IndividualResultList: React.FC = () => {
         }
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.download = `${certificateResult.eventName}_certificate.png`;
+        link.download = `${certificateResult.eventName || 'Competition'}_certificate.png`;
         link.href = url;
         document.body.appendChild(link);
         link.click();
@@ -178,14 +178,14 @@ const IndividualResultList: React.FC = () => {
 
   const filteredResults = results
     .filter(result => {
-      const matchesSearch = result.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      const matchesSearch = result.eventName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            result.category.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || result.category.name === selectedCategory;
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
       if (sortBy === 'date') return new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime();
-      if (sortBy === 'name') return a.eventName.localeCompare(b.eventName);
+      if (sortBy === 'name') return (a.eventName || '').localeCompare(b.eventName || '');
       return 0;
     });
 
@@ -308,7 +308,7 @@ const IndividualResultList: React.FC = () => {
           <div className="flex items-start justify-between mb-6">
             <div className="flex-1">
               <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2">
-                {result.eventName}
+                {result.eventName || 'Competition'}
               </h3>
               <div className="flex items-center gap-3 mt-3">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100/80 text-blue-800 backdrop-blur-sm">
@@ -406,7 +406,7 @@ const IndividualResultList: React.FC = () => {
         <tbody>
           {filteredResults.map((result, index) => (
             <tr key={result._id} className={`border-b border-gray-100/50 last:border-b-0 hover:bg-blue-50/50 transition-all duration-200 animate-fade-in-up`} style={{ animationDelay: `${index * 0.1}s` }}>
-              <td className="px-6 py-4 font-semibold text-gray-900">{result.eventName}</td>
+                              <td className="px-6 py-4 font-semibold text-gray-900">{result.eventName || 'Competition'}</td>
               <td className="px-6 py-4">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100/80 text-blue-800 backdrop-blur-sm">
                   {result.category?.name || 'Unknown'}
@@ -485,7 +485,7 @@ const IndividualResultList: React.FC = () => {
         <div className="p-6 sm:p-8 space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900">{result.eventName}</h3>
+                              <h3 className="text-lg sm:text-xl font-bold text-gray-900">{result.eventName || 'Competition'}</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Award className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />

@@ -17,7 +17,8 @@ import {
   X, 
   Plus,
   Zap,
-  Compass
+  Compass,
+  Award
 } from 'lucide-react';
 
 const MobileAppNavigation: React.FC = () => {
@@ -56,15 +57,18 @@ const MobileAppNavigation: React.FC = () => {
 
   const userNavigationItems = [
     { path: '/user', label: 'Results', icon: Trophy, color: 'blue', description: 'View your results' },
-    { path: '/tv', label: 'TV Display', icon: Tv, color: 'purple', description: 'Live TV display' },
+    { path: '/user/group-points', label: 'Group Points', icon: Award, color: 'green', description: 'Group leaderboard' },
   ];
 
   const adminNavigationItems = [
-    // { path: '/admin', label: 'Dashboard', icon: BarChart3, color: 'blue', description: 'Admin overview' },
-    { path: '/admin/individual-results', label: 'Individual', icon: User, color: 'green', description: 'Individual results' },
-    { path: '/admin/group-results', label: 'Group', icon: Users, color: 'orange', description: 'Group results' },
-    { path: '/admin/categories', label: 'Categories', icon: FolderOpen, color: 'purple', description: 'Manage categories' },
-  ];
+  // { path: '/admin', label: 'Dashboard', icon: BarChart3, color: 'blue', description: 'Admin overview' },
+  { path: '/admin/individual-results', label: 'Individual', icon: User, color: 'green', description: 'Individual results' },
+  { path: '/admin/group-results', label: 'Group', icon: Users, color: 'orange', description: 'Group results' },
+  { path: '/admin/categories', label: 'Categories', icon: FolderOpen, color: 'purple', description: 'Manage categories' },
+  { path: '/admin/groups', label: 'Groups', icon: Award, color: 'blue', description: 'Manage groups' },
+ 
+  { path: '/admin/group-points-selector', label: 'Add Points', icon: Plus, color: 'green', description: 'Add points to groups' },
+];
 
   const navigationItems = isAdminRoute ? adminNavigationItems : userNavigationItems;
 

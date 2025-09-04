@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Plus, Settings, Users, FileText, BarChart3, Shield, Grid, List, Search } from 'lucide-react';
 import ResultForm from './ResultForm';
 import CategoryManager from './CategoryManager';
+import GroupManager from './GroupManager';
 
 const AdminDashboard: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<'overview' | 'add-result' | 'categories'>('overview');
+  const [activeSection, setActiveSection] = useState<'overview' | 'add-result' | 'categories' | 'groups'>('overview');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showForm, setShowForm] = useState(false);
 
@@ -125,6 +126,16 @@ const AdminDashboard: React.FC = () => {
             >
               Categories
             </button>
+            <button
+              onClick={() => setActiveSection('groups')}
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                activeSection === 'groups'
+                  ? 'bg-white text-red-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Groups
+            </button>
           </div>
         </div>
       </div>
@@ -233,6 +244,12 @@ const AdminDashboard: React.FC = () => {
         {activeSection === 'categories' && (
           <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 p-6">
             <CategoryManager />
+          </div>
+        )}
+
+        {activeSection === 'groups' && (
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 p-6">
+            <GroupManager />
           </div>
         )}
       </div>

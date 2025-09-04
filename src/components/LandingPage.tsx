@@ -27,7 +27,7 @@ const LandingPage: React.FC = () => {
         </div>
 
         {/* Access Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {/* User Access */}
           <Link
             to="/user"
@@ -43,26 +43,6 @@ const LandingPage: React.FC = () => {
               </p>
               <div className="flex items-center justify-center gap-2 text-blue-600 font-medium">
                 <span>Enter User Portal</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-              </div>
-            </div>
-          </Link>
-
-          {/* TV Display */}
-          <Link
-            to="/tv"
-            className="group bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100/50 p-8 hover:shadow-xl transition-all duration-300 hover:scale-105"
-          >
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200 transition-colors duration-200">
-                <Monitor className="w-8 h-8 text-purple-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">TV Display</h2>
-              <p className="text-gray-600 mb-6">
-                Full-screen Mawlid results display for TV, projectors, and large screens
-              </p>
-              <div className="flex items-center justify-center gap-2 text-purple-600 font-medium">
-                <span>Launch TV Mode</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               </div>
             </div>

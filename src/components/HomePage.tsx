@@ -17,20 +17,26 @@ interface Position {
   details: string;
 }
 
+interface GroupPosition {
+  groupId: string;
+  name: string;
+  details: string;
+  points: number;
+}
+
 interface Result {
   _id: string;
   category: Category;
-  eventName: string;
-  eventDate: string;
+  eventName?: string;
+  eventDate?: string;
   individual: {
     first: Position;
     second: Position;
     third: Position;
   } | null;
   group: {
-    first: Position;
-    second: Position;
-    third: Position;
+    positions: GroupPosition[];
+    totalGroups: number;
   } | null;
   createdAt: string;
   updatedAt: Date;
@@ -71,15 +77,13 @@ const HomePage: React.FC = () => {
           r.individual.first?.name || r.individual.second?.name || r.individual.third?.name
         );
       } else {
-        return r.group && (
-          r.group.first?.name || r.group.second?.name || r.group.third?.name
-        );
+        return r.group && r.group.positions && r.group.positions.length > 0;
       }
     });
 
     if (searchTerm) {
       filtered = filtered.filter(result =>
-        result.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        result.eventName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         result.category.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -126,7 +130,7 @@ const HomePage: React.FC = () => {
       const imgData = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.href = imgData;
-      link.download = `${certificateResult.eventName}_${certificateResult.category.name}_certificate.png`;
+      link.download = `${certificateResult.eventName || 'Competition'}_${certificateResult.category.name}_certificate.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -240,7 +244,7 @@ const HomePage: React.FC = () => {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {result.eventName}
+                    {result.eventName || 'Competition'}
                   </h3>
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                     <div className="flex items-center gap-1">
@@ -303,39 +307,29 @@ const HomePage: React.FC = () => {
 
                 {activeTab === 'group' && result.group && (
                   <div className="grid grid-cols-1 gap-3">
-                    {result.group.first && (
-                      <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl p-4 text-white">
+                    {result.group.positions.map((position, index) => (
+                      <div key={index} className={`rounded-xl p-4 text-white ${
+                        index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500' :
+                        index === 1 ? 'bg-gradient-to-r from-gray-400 to-gray-500' :
+                        index === 2 ? 'bg-gradient-to-r from-orange-400 to-orange-500' :
+                        'bg-gradient-to-r from-blue-400 to-blue-500'
+                      }`}>
                         <div className="flex items-center gap-3">
-                          <div className="text-3xl">🥇</div>
+                          <div className="text-3xl">
+                            {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅'}
+                          </div>
                           <div>
-                            <div className="font-semibold text-lg">1st Place</div>
-                            <div className="text-sm">{result.group.first.name}</div>
+                            <div className="font-semibold text-lg">
+                              {index === 0 ? '1st' : index === 1 ? '2nd' : index === 2 ? '3rd' : `${index + 1}th`} Place
+                            </div>
+                            <div className="text-sm">{position.name}</div>
+                            {position.points > 0 && (
+                              <div className="text-xs opacity-90">{position.points} points</div>
+                            )}
                           </div>
                         </div>
                       </div>
-                    )}
-                    {result.group.second && (
-                      <div className="bg-gradient-to-r from-gray-400 to-gray-500 rounded-xl p-4 text-white">
-                        <div className="flex items-center gap-3">
-                          <div className="text-3xl">🥈</div>
-                          <div>
-                            <div className="font-semibold text-lg">2nd Place</div>
-                            <div className="text-sm">{result.group.second.name}</div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {result.group.third && (
-                      <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-xl p-4 text-white">
-                        <div className="flex items-center gap-3">
-                          <div className="text-3xl">🥉</div>
-                          <div>
-                            <div className="font-semibold text-lg">3rd Place</div>
-                            <div className="text-sm">{result.group.third.name}</div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                    ))}
                   </div>
                 )}
               </div>

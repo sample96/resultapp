@@ -20,8 +20,8 @@ interface Position {
 interface Result {
   _id: string;
   category: Category;
-  eventName: string;
-  eventDate: string;
+  eventName?: string;
+  eventDate?: string;
   individual: {
     first: Position;
     second: Position;
@@ -171,7 +171,7 @@ const ResultList: React.FC = () => {
       
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.download = `${certificateResult.eventName}_certificate.png`;
+      link.download = `${certificateResult.eventName || 'Competition'}_certificate.png`;
       link.href = url;
       
       // Ensure link is added to DOM for some browsers
@@ -225,7 +225,7 @@ const ResultList: React.FC = () => {
           <div key={result._id} className="bg-white rounded-lg shadow border border-gray-100 p-4 flex flex-col gap-2 animate-fade-in">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <div className="text-base font-bold text-gray-900">{result.eventName}</div>
+                <div className="text-base font-bold text-gray-900">{result.eventName || 'Competition'}</div>
                 <div className="text-xs text-blue-600 font-medium">{result.category?.name || 'Unknown'}</div>
                 <div className="text-xs text-gray-500">{new Date(result.eventDate).toLocaleDateString()}</div>
               </div>
@@ -294,7 +294,7 @@ const ResultList: React.FC = () => {
           <tbody>
             {results.map((result) => (
               <tr key={result._id} className="border-b last:border-b-0 hover:bg-blue-50 transition-colors">
-                <td className="px-2 sm:px-3 py-2 font-semibold whitespace-nowrap">{result.eventName}</td>
+                <td className="px-2 sm:px-3 py-2 font-semibold whitespace-nowrap">{result.eventName || 'Competition'}</td>
                 <td className="px-2 sm:px-3 py-2 whitespace-nowrap">{result.category?.name || 'Unknown'}</td>
                 <td className="px-2 sm:px-3 py-2 whitespace-nowrap">{new Date(result.eventDate).toLocaleDateString()}</td>
                 <td className="px-2 sm:px-3 py-2">

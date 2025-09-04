@@ -12,6 +12,10 @@ import AdminDashboard from './components/AdminDashboard';
 import LandingPage from './components/LandingPage';
 import TVResultsDisplay from './components/TVResultsDisplay';
 import RoleSwitcher from './components/RoleSwitcher';
+
+import GroupPointsView from './components/GroupPointsView';
+import GroupPointsSelector from './components/GroupPointsSelector';
+import GroupManager from './components/GroupManager';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const AppContent: React.FC = () => {
@@ -62,15 +66,18 @@ const AppContent: React.FC = () => {
   // Navigation items - centralized for consistency
   const userNavigationItems = [
     { path: '/user', label: 'Results', icon: '🏆' },
-    { path: '/tv', label: 'TV Display', icon: '📺' },
+    { path: '/user/group-points', label: 'Group Points', icon: '🏅' },
   ];
 
   const adminNavigationItems = [
-    { path: '/admin', label: 'Dashboard', icon: '📊' },
-    { path: '/admin/individual-results', label: 'Individual Results', icon: '👤' },
-    { path: '/admin/group-results', label: 'Group Results', icon: '👥' },
-    { path: '/admin/categories', label: 'Categories', icon: '📂' },
-  ];
+  { path: '/admin', label: 'Dashboard', icon: '📊' },
+  { path: '/admin/individual-results', label: 'Individual Results', icon: '👤' },
+  { path: '/admin/group-results', label: 'Group Results', icon: '👥' },
+  { path: '/admin/categories', label: 'Categories', icon: '📂' },
+  { path: '/admin/groups', label: 'Groups', icon: '🏆' },
+  { path: '/admin/group-points', label: 'Group Points', icon: '🏆' },
+  { path: '/admin/group-points-selector', label: 'Add Points', icon: '➕' },
+];
 
   const navigationItems = isAdminRoute ? adminNavigationItems : userNavigationItems;
 
@@ -177,15 +184,18 @@ const AppContent: React.FC = () => {
             {/* Landing page */}
             <Route path="/" element={<LandingPage />} />
             
-            {/* User Routes */}
-            <Route path="/user" element={<HomePage />} />
-            <Route path="/tv" element={<TVResultsDisplay />} />
-            
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/categories" element={<CategoryManager />} />
+            <Route path="/admin/groups" element={<GroupManager />} />
             <Route path="/admin/individual-results" element={<IndividualResultList />} />
             <Route path="/admin/group-results" element={<GroupResultList />} />
+            <Route path="/admin/group-points-selector" element={<GroupPointsSelector />} />
+            
+            {/* User Routes */}
+            <Route path="/user" element={<HomePage />} />
+            <Route path="/user/group-points" element={<GroupPointsView />} />
+            <Route path="/tv" element={<TVResultsDisplay />} />
             
             {/* Catch all - redirect to landing */}
             <Route path="*" element={<Navigate to="/" replace />} />

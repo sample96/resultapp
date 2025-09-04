@@ -9,7 +9,6 @@ const Navbar: React.FC = () => {
 
   const userNavigationItems = [
     { path: '/user', label: 'Results', icon: Trophy },
-    { path: '/tv', label: 'TV Display', icon: Tv },
   ];
 
   const adminNavigationItems = [

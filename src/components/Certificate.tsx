@@ -98,7 +98,7 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
           </div>
           <div className="bg-white rounded-full px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 shadow-lg">
             <span className="text-blue-600 font-bold text-xs sm:text-sm md:text-base lg:text-lg">
-              {result.eventName?.toUpperCase() || 'EVENT'}
+              {result.eventName?.toUpperCase() || 'COMPETITION'}
             </span>
           </div>
         </div>
@@ -178,6 +178,9 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
                     {result.group.first.details && (
                       <div className="text-xs sm:text-sm opacity-90 truncate">{result.group.first.details}</div>
                     )}
+                    {result.group.first.points > 0 && (
+                      <div className="text-xs sm:text-sm font-bold text-yellow-200 mt-1">{result.group.first.points} points</div>
+                    )}
                   </div>
                   <div className="text-yellow-300 text-lg sm:text-xl md:text-2xl">🏅</div>
                 </div>
@@ -196,6 +199,9 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
                     {result.group.second.details && (
                       <div className="text-xs sm:text-sm opacity-90 truncate">{result.group.second.details}</div>
                     )}
+                    {result.group.second.points > 0 && (
+                      <div className="text-xs sm:text-sm font-bold text-gray-200 mt-1">{result.group.second.points} points</div>
+                    )}
                   </div>
                   <div className="text-gray-300 text-lg sm:text-xl md:text-2xl">🥈</div>
                 </div>
@@ -213,6 +219,9 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
                     <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">{result.group.third.name}</div>
                     {result.group.third.details && (
                       <div className="text-xs sm:text-sm opacity-90 truncate">{result.group.third.details}</div>
+                    )}
+                    {result.group.third.points > 0 && (
+                      <div className="text-xs sm:text-sm font-bold text-orange-200 mt-1">{result.group.third.points} points</div>
                     )}
                   </div>
                   <div className="text-orange-300 text-lg sm:text-xl md:text-2xl">🥉</div>

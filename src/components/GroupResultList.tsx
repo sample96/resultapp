@@ -17,20 +17,44 @@ interface Position {
   details: string;
 }
 
+interface GroupPosition {
+  groupId: {
+    _id: string;
+    name: string;
+    description: string;
+    points: number;
+    isActive: boolean;
+    memberCount: number;
+    totalPoints: number;
+    achievements: Array<{
+      eventName: string;
+      position: string;
+      points: number;
+      date: string;
+      _id: string;
+    }>;
+    createdAt: string;
+    updatedAt: string;
+  };
+  name: string;
+  details: string;
+  points: number;
+  _id: string;
+}
+
 interface Result {
   _id: string;
   category: Category;
-  eventName: string;
-  eventDate: string;
+  eventName?: string;
+  eventDate?: string;
   individual: {
     first: Position;
     second: Position;
     third: Position;
   } | null;
   group: {
-    first: Position;
-    second: Position;
-    third: Position;
+    positions: GroupPosition[];
+    totalGroups: number;
   } | null;
   createdAt: string;
   updatedAt: Date;
@@ -60,9 +84,7 @@ const GroupResultList: React.FC = () => {
     try {
       setRefreshing(true);
       const response = await api.get('/results');
-      setResults(response.data.filter((r: Result) => r.group && (
-        r.group.first?.name || r.group.second?.name || r.group.third?.name
-      )));
+      setResults(response.data.filter((r: Result) => r.group && r.group.positions && r.group.positions.length > 0));
     } catch (error) {
       toast.error('Failed to fetch results');
     } finally {
@@ -161,7 +183,7 @@ const GroupResultList: React.FC = () => {
         }
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.download = `${certificateResult.eventName}_certificate.png`;
+        link.download = `${certificateResult.eventName || 'Competition'}_certificate.png`;
         link.href = url;
         document.body.appendChild(link);
         link.click();
@@ -178,14 +200,14 @@ const GroupResultList: React.FC = () => {
 
   const filteredResults = results
     .filter(result => {
-      const matchesSearch = result.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      const matchesSearch = result.eventName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            result.category.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || result.category.name === selectedCategory;
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
-      if (sortBy === 'date') return new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime();
-      if (sortBy === 'name') return a.eventName.localeCompare(b.eventName);
+      if (sortBy === 'date') return new Date(b.eventDate || new Date()).getTime() - new Date(a.eventDate || new Date()).getTime();
+      if (sortBy === 'name') return (a.eventName || '').localeCompare(b.eventName || '');
       return 0;
     });
 
@@ -224,7 +246,7 @@ const GroupResultList: React.FC = () => {
                 </span>
                 <span className="inline-flex items-center gap-1 text-xs text-gray-500">
                   <Calendar className="w-3 h-3" />
-                  {new Date(result.eventDate).toLocaleDateString()}
+                  {new Date(result.eventDate || new Date()).toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -244,29 +266,29 @@ const GroupResultList: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              {['first', 'second', 'third'].map((place, idx) => {
-                const pos = result.group && result.group[place as keyof typeof result.group];
-                return pos && pos.name ? (
-                  <div key={place} className={`flex items-center gap-3 p-3 rounded-lg ${getRankBg(idx)} ${getRankBorder(idx)} border hover:bg-opacity-80 transition-all duration-200`}>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{["🥇", "🥈", "🥉"][idx]}</span>
-                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {place}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className={`font-semibold ${getRankColor(idx)} text-sm truncate`}>
-                        {pos.name}
-                      </div>
-                      {pos.details && (
-                        <div className="text-xs text-gray-500 truncate">
-                          {pos.details}
-                        </div>
-                      )}
-                    </div>
+              {result.group?.positions.map((pos, idx) => (
+                <div key={pos._id} className={`flex items-center gap-3 p-3 rounded-lg ${getRankBg(idx)} ${getRankBorder(idx)} border hover:bg-opacity-80 transition-all duration-200`}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{["🥇", "🥈", "🥉"][idx]}</span>
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {idx === 0 ? '1st' : idx === 1 ? '2nd' : '3rd'}
+                    </span>
                   </div>
-                ) : null;
-              })}
+                  <div className="flex-1 min-w-0">
+                    <div className={`font-semibold ${getRankColor(idx)} text-sm truncate`}>
+                      {pos.name}
+                    </div>
+                    {pos.details && (
+                      <div className="text-xs text-gray-500 truncate">
+                        {pos.details}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-medium text-gray-600">{pos.points || 0} pts</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -308,7 +330,7 @@ const GroupResultList: React.FC = () => {
           <div className="flex items-start justify-between mb-6">
             <div className="flex-1">
               <h3 className="text-xl font-bold text-gray-900 group-hover:text-green-600 transition-colors duration-200 line-clamp-2">
-                {result.eventName}
+                {result.eventName || 'Competition'}
               </h3>
               <div className="flex items-center gap-3 mt-3">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100/80 text-green-800 backdrop-blur-sm">
@@ -316,7 +338,7 @@ const GroupResultList: React.FC = () => {
                 </span>
                 <span className="inline-flex items-center gap-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />
-                  {new Date(result.eventDate).toLocaleDateString()}
+                  {new Date(result.eventDate || new Date()).toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -336,29 +358,29 @@ const GroupResultList: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-1 gap-3">
-              {['first', 'second', 'third'].map((place, idx) => {
-                const pos = result.group && result.group[place as keyof typeof result.group];
-                return pos && pos.name ? (
-                  <div key={place} className={`flex items-center gap-4 p-4 rounded-xl ${getRankBg(idx)} ${getRankBorder(idx)} border hover:bg-opacity-80 transition-all duration-200`}>
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{["🥇", "🥈", "🥉"][idx]}</span>
-                      <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">
-                        {place}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className={`font-semibold ${getRankColor(idx)} text-base`}>
-                        {pos.name}
-                      </div>
-                      {pos.details && (
-                        <div className="text-sm text-gray-500 mt-1">
-                          {pos.details}
-                        </div>
-                      )}
-                    </div>
+              {result.group?.positions.map((pos, idx) => (
+                <div key={pos._id} className={`flex items-center gap-4 p-4 rounded-xl ${getRankBg(idx)} ${getRankBorder(idx)} border hover:bg-opacity-80 transition-all duration-200`}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{["🥇", "🥈", "🥉"][idx]}</span>
+                    <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+                      {idx === 0 ? '1st' : idx === 1 ? '2nd' : '3rd'}
+                    </span>
                   </div>
-                ) : null;
-              })}
+                  <div className="flex-1 min-w-0">
+                    <div className={`font-semibold ${getRankColor(idx)} text-base`}>
+                      {pos.name}
+                    </div>
+                    {pos.details && (
+                      <div className="text-sm text-gray-500 mt-1">
+                        {pos.details}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-600">{pos.points || 0} pts</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -406,27 +428,24 @@ const GroupResultList: React.FC = () => {
         <tbody>
           {filteredResults.map((result, index) => (
             <tr key={result._id} className={`border-b border-gray-100/50 last:border-b-0 hover:bg-green-50/50 transition-all duration-200 animate-fade-in-up`} style={{ animationDelay: `${index * 0.1}s` }}>
-              <td className="px-6 py-4 font-semibold text-gray-900">{result.eventName}</td>
+                              <td className="px-6 py-4 font-semibold text-gray-900">{result.eventName || 'Competition'}</td>
               <td className="px-6 py-4">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100/80 text-green-800 backdrop-blur-sm">
                   {result.category?.name || 'Unknown'}
                 </span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">{new Date(result.eventDate).toLocaleDateString()}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{new Date(result.eventDate || new Date()).toLocaleDateString()}</td>
               <td className="px-6 py-4">
                 <div className="space-y-2">
-                  {['first', 'second', 'third'].map((place, idx) => {
-                    const pos = result.group && result.group[place as keyof typeof result.group];
-                    return pos && pos.name ? (
-                      <div key={place} className={`flex items-center gap-3 p-3 rounded-lg ${getRankBg(idx)} ${getRankBorder(idx)} border`}>
-                        <span className="text-lg">{["🥇", "🥈", "🥉"][idx]}</span>
-                        <div className="flex-1">
-                          <div className={`font-semibold ${getRankColor(idx)} text-sm`}>{pos.name}</div>
-                          {pos.details && <div className="text-xs text-gray-500">{pos.details}</div>}
-                        </div>
+                  {result.group?.positions.map((pos, idx) => (
+                    <div key={pos._id} className={`flex items-center gap-3 p-3 rounded-lg ${getRankBg(idx)} ${getRankBorder(idx)} border`}>
+                      <span className="text-lg">{["🥇", "🥈", "🥉"][idx]}</span>
+                      <div className="flex-1">
+                        <div className={`font-semibold ${getRankColor(idx)} text-sm`}>{pos.name}</div>
+                        {pos.details && <div className="text-xs text-gray-500">{pos.details}</div>}
                       </div>
-                    ) : null;
-                  })}
+                    </div>
+                  ))}
                 </div>
               </td>
               <td className="px-6 py-4">
@@ -485,7 +504,7 @@ const GroupResultList: React.FC = () => {
         <div className="p-6 sm:p-8 space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900">{result.eventName}</h3>
+                              <h3 className="text-lg sm:text-xl font-bold text-gray-900">{result.eventName || 'Competition'}</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Award className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
@@ -493,7 +512,7 @@ const GroupResultList: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                  <span className="text-sm sm:text-base text-gray-600">Date: {new Date(result.eventDate).toLocaleDateString()}</span>
+                  <span className="text-sm sm:text-base text-gray-600">Date: {new Date(result.eventDate || new Date()).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
@@ -504,24 +523,24 @@ const GroupResultList: React.FC = () => {
                 Group Results
               </h4>
               <div className="space-y-3">
-                {['first', 'second', 'third'].map((place, idx) => {
-                  const pos = result.group && result.group[place as keyof typeof result.group];
-                  return pos && pos.name ? (
-                    <div key={place} className="flex items-center gap-3 p-3 bg-white/80 rounded-lg shadow-sm hover:bg-white transition-all duration-200">
-                      <span className="text-xl sm:text-2xl">{["🥇", "🥈", "🥉"][idx]}</span>
-                      <div className="flex-1">
-                        <div className={`font-semibold ${getRankColor(idx)} text-sm sm:text-base`}>
-                          {pos.name}
-                        </div>
-                        {pos.details && (
-                          <div className="text-xs sm:text-sm text-gray-500">
-                            {pos.details}
-                          </div>
-                        )}
+                {result.group?.positions.map((pos, idx) => (
+                  <div key={pos._id} className="flex items-center gap-3 p-3 bg-white/80 rounded-lg shadow-sm hover:bg-white transition-all duration-200">
+                    <span className="text-xl sm:text-2xl">{["🥇", "🥈", "🥉"][idx]}</span>
+                    <div className="flex-1">
+                      <div className={`font-semibold ${getRankColor(idx)} text-sm sm:text-base`}>
+                        {pos.name}
                       </div>
+                      {pos.details && (
+                        <div className="text-xs sm:text-sm text-gray-500">
+                          {pos.details}
+                        </div>
+                      )}
                     </div>
-                  ) : null;
-                })}
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-blue-600">{pos.points || 0} pts</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
