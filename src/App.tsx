@@ -70,7 +70,7 @@ const AppContent: React.FC = () => {
   ];
 
   const adminNavigationItems = [
-  { path: '/admin', label: 'Dashboard', icon: '📊' },
+  // { path: '/admin', label: 'Dashboard', icon: '📊' },
   { path: '/admin/individual-results', label: 'Individual Results', icon: '👤' },
   { path: '/admin/group-results', label: 'Group Results', icon: '👥' },
   { path: '/admin/categories', label: 'Categories', icon: '📂' },
@@ -185,7 +185,7 @@ const AppContent: React.FC = () => {
             <Route path="/" element={<LandingPage />} />
             
             {/* Admin Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin" element={<IndividualResultList />} />
             <Route path="/admin/categories" element={<CategoryManager />} />
             <Route path="/admin/groups" element={<GroupManager />} />
             <Route path="/admin/individual-results" element={<IndividualResultList />} />

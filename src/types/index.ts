@@ -29,7 +29,7 @@ export interface Position {
 }
 
 export interface GroupPosition {
-  groupId: string;
+  groupId: string | Group;
   name: string;
   details: string;
   points: number;

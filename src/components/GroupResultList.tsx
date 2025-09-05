@@ -18,7 +18,7 @@ interface Position {
 }
 
 interface GroupPosition {
-  groupId: {
+  groupId: string | {
     _id: string;
     name: string;
     description: string;

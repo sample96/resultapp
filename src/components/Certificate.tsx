@@ -7,6 +7,39 @@ interface CertificateProps {
 }
 
 const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
+  // Helper function to safely extract group information
+  const getGroupInfo = (group: any) => {
+    if (typeof group.groupId === 'object' && group.groupId !== null) {
+      return {
+        name: group.groupId.name || group.name || 'Unknown Group',
+        id: group.groupId._id || 'Unknown ID',
+        description: group.groupId.description || group.details || ''
+      };
+    }
+    return {
+      name: group.name || 'Unknown Group',
+      id: group.groupId || 'Unknown ID',
+      description: group.details || ''
+    };
+  };
+
+  // Helper function to count actual individual participants
+  const getIndividualParticipantCount = () => {
+    if (!result.individual) return 0;
+    
+    let count = 0;
+    if (result.individual.first && result.individual.first.name && result.individual.first.name.trim() !== '') {
+      count++;
+    }
+    if (result.individual.second && result.individual.second.name && result.individual.second.name.trim() !== '') {
+      count++;
+    }
+    if (result.individual.third && result.individual.third.name && result.individual.third.name.trim() !== '') {
+      count++;
+    }
+    return count;
+  };
+
   return (
     <div
       id={id}
@@ -81,7 +114,7 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
           })}
         </div> */}
       </div>
-
+      
       {/* Bottom Section - Blue Rectangle */}
       <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-4 sm:p-6 md:p-8 lg:p-12 relative mx-2 sm:mx-4 md:mx-6 lg:mx-8 my-3 sm:my-4 md:my-6 rounded-xl sm:rounded-2xl shadow-xl">
         {/* Category and Event Name Header */}
@@ -99,73 +132,42 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
           <div className="bg-white rounded-full px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 shadow-lg">
             <span className="text-blue-600 font-bold text-xs sm:text-sm md:text-base lg:text-lg">
               {result.eventName?.toUpperCase() || 'COMPETITION'}
-            </span>
+                  </span>
           </div>
+        </div>
+
+        {/* Category Description */}
+        {result.category?.description && (
+          <div className="text-center mb-6 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+            <div className="text-xs sm:text-sm text-blue-200 mb-1">Category Description</div>
+            <div className="text-sm sm:text-base text-white font-medium">
+              {result.category.description}
+            </div>
+          </div>
+        )}
+
+        {/* Results Summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 p-3 sm:p-4 bg-white/10 rounded-lg backdrop-blur-sm">
+          
+         
+          {/* Show both if it's a mixed result */}
+          {result.group && result.group.positions && result.group.positions.length > 0 && result.individual && (
+            <div className="text-center">
+              <div className="text-xs sm:text-sm text-blue-200 mb-1">Individual Participants</div>
+              <div className="text-sm sm:text-base md:text-lg font-bold text-white">
+                {getIndividualParticipantCount()}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Results Display */}
         <div className="space-y-3 sm:space-y-4 md:space-y-6">
-          {/* First Place */}
-          {result.individual?.first && (
-            <div className="flex items-center gap-3 sm:gap-4 md:gap-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl backdrop-blur-sm">
-              <div className="relative">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl md:text-2xl shadow-lg medal-shine">
-                  🏆
-                </div>
-                <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-yellow-300 rounded-full flex items-center justify-center text-yellow-800 font-bold text-xs sm:text-sm">1</div>
-              </div>
-              <div className="text-white flex-1 min-w-0">
-                <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">{result.individual.first.name}</div>
-                {result.individual.first.details && (
-                  <div className="text-xs sm:text-sm opacity-90 truncate">{result.individual.first.details}</div>
-                )}
-              </div>
-              <div className="text-yellow-300 text-lg sm:text-xl md:text-2xl">🏅</div>
-            </div>
-          )}
-
-          {/* Second Place */}
-          {result.individual?.second && (
-            <div className="flex items-center gap-3 sm:gap-4 md:gap-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl backdrop-blur-sm">
-              <div className="relative">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl md:text-2xl shadow-lg medal-shine">
-                  🏆
-                </div>
-                <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-800 font-bold text-xs sm:text-sm">2</div>
-              </div>
-              <div className="text-white flex-1 min-w-0">
-                <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">{result.individual.second.name}</div>
-                {result.individual.second.details && (
-                  <div className="text-xs sm:text-sm opacity-90 truncate">{result.individual.second.details}</div>
-                )}
-              </div>
-              <div className="text-gray-300 text-lg sm:text-xl md:text-2xl">🥈</div>
-            </div>
-          )}
-
-          {/* Third Place */}
-          {result.individual?.third && (
-            <div className="flex items-center gap-3 sm:gap-4 md:gap-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl backdrop-blur-sm">
-              <div className="relative">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-orange-500 to-orange-700 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl md:text-2xl shadow-lg medal-shine">
-                  🏆
-                </div>
-                <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-orange-400 rounded-full flex items-center justify-center text-orange-800 font-bold text-xs sm:text-sm">3</div>
-              </div>
-              <div className="text-white flex-1 min-w-0">
-                <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">{result.individual.third.name}</div>
-                {result.individual.third.details && (
-                  <div className="text-xs sm:text-sm opacity-90 truncate">{result.individual.third.details}</div>
-                )}
-              </div>
-              <div className="text-orange-300 text-lg sm:text-xl md:text-2xl">🥉</div>
-            </div>
-          )}
-
-          {/* Group Results */}
-          {result.group && (
+          {/* Individual Results - Only show if NOT a group result */}
+          {!result.group && result.individual && getIndividualParticipantCount() > 0 && (
             <>
-              {result.group.first && (
+              {/* First Place */}
+              {result.individual.first && result.individual.first.name && result.individual.first.name.trim() !== '' && (
                 <div className="flex items-center gap-3 sm:gap-4 md:gap-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl backdrop-blur-sm">
                   <div className="relative">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl md:text-2xl shadow-lg medal-shine">
@@ -174,19 +176,17 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
                     <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-yellow-300 rounded-full flex items-center justify-center text-yellow-800 font-bold text-xs sm:text-sm">1</div>
                   </div>
                   <div className="text-white flex-1 min-w-0">
-                    <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">{result.group.first.name}</div>
-                    {result.group.first.details && (
-                      <div className="text-xs sm:text-sm opacity-90 truncate">{result.group.first.details}</div>
-                    )}
-                    {result.group.first.points > 0 && (
-                      <div className="text-xs sm:text-sm font-bold text-yellow-200 mt-1">{result.group.first.points} points</div>
+                    <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">{result.individual.first.name}</div>
+                    {result.individual.first.details && (
+                      <div className="text-xs sm:text-sm opacity-90 truncate">{result.individual.first.details}</div>
                     )}
                   </div>
                   <div className="text-yellow-300 text-lg sm:text-xl md:text-2xl">🏅</div>
                 </div>
               )}
 
-              {result.group.second && (
+              {/* Second Place */}
+              {result.individual.second && result.individual.second.name && result.individual.second.name.trim() !== '' && (
                 <div className="flex items-center gap-3 sm:gap-4 md:gap-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl backdrop-blur-sm">
                   <div className="relative">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl md:text-2xl shadow-lg medal-shine">
@@ -195,19 +195,17 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
                     <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-800 font-bold text-xs sm:text-sm">2</div>
                   </div>
                   <div className="text-white flex-1 min-w-0">
-                    <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">{result.group.second.name}</div>
-                    {result.group.second.details && (
-                      <div className="text-xs sm:text-sm opacity-90 truncate">{result.group.second.details}</div>
-                    )}
-                    {result.group.second.points > 0 && (
-                      <div className="text-xs sm:text-sm font-bold text-gray-200 mt-1">{result.group.second.points} points</div>
+                    <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">{result.individual.second.name}</div>
+                    {result.individual.second.details && (
+                      <div className="text-xs sm:text-sm opacity-90 truncate">{result.individual.second.details}</div>
                     )}
                   </div>
                   <div className="text-gray-300 text-lg sm:text-xl md:text-2xl">🥈</div>
                 </div>
               )}
 
-              {result.group.third && (
+              {/* Third Place */}
+              {result.individual.third && result.individual.third.name && result.individual.third.name.trim() !== '' && (
                 <div className="flex items-center gap-3 sm:gap-4 md:gap-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl backdrop-blur-sm">
                   <div className="relative">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-orange-500 to-orange-700 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl md:text-2xl shadow-lg medal-shine">
@@ -216,15 +214,81 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
                     <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-orange-400 rounded-full flex items-center justify-center text-orange-800 font-bold text-xs sm:text-sm">3</div>
                   </div>
                   <div className="text-white flex-1 min-w-0">
-                    <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">{result.group.third.name}</div>
-                    {result.group.third.details && (
-                      <div className="text-xs sm:text-sm opacity-90 truncate">{result.group.third.details}</div>
-                    )}
-                    {result.group.third.points > 0 && (
-                      <div className="text-xs sm:text-sm font-bold text-orange-200 mt-1">{result.group.third.points} points</div>
+                    <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">{result.individual.third.name}</div>
+                    {result.individual.third.details && (
+                      <div className="text-xs sm:text-sm opacity-90 truncate">{result.individual.third.details}</div>
                     )}
                   </div>
                   <div className="text-orange-300 text-lg sm:text-xl md:text-2xl">🥉</div>
+                </div>
+              )}
+            </>
+          )}
+      
+      {/* Group Results */}
+          {result.group && result.group.positions && result.group.positions.length > 0 && (
+            <>
+              {/* Group Results Header */}
+              <div className="text-center mb-4">
+                <div className="text-sm sm:text-base md:text-lg font-bold text-white mb-2">
+                  GROUP RESULTS
+                </div>
+                <div className="text-xs sm:text-sm text-blue-200">
+                  Total Groups Participated: {result.group.totalGroups || result.group.positions.length}
+                </div>
+              </div>
+
+              {/* Group Positions */}
+              {result.group.positions.slice(0, 3).map((group, index) => {
+                const positionColors = [
+                  { bg: 'from-yellow-400 to-yellow-600', badge: 'bg-yellow-300', text: 'text-yellow-800', medal: 'text-yellow-300', icon: '🏅', medalIcon: '🥇' },
+                  { bg: 'from-gray-400 to-gray-600', badge: 'bg-gray-300', text: 'text-gray-800', medal: 'text-gray-300', icon: '🏅', medalIcon: '🥈' },
+                  { bg: 'from-orange-500 to-orange-700', badge: 'bg-orange-400', text: 'text-orange-800', medal: 'text-orange-300', icon: '🏅', medalIcon: '🥉' }
+                ];
+                
+                const colors = positionColors[index];
+                const positionNumber = index + 1;
+                const groupInfo = getGroupInfo(group);
+
+                return (
+                  <div key={groupInfo.id || index} className="flex items-center gap-3 sm:gap-4 md:gap-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl backdrop-blur-sm">
+                    <div className="relative">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-br ${colors.bg} rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl md:text-2xl shadow-lg medal-shine`}>
+                        🏆
+                      </div>
+                      <div className={`absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 ${colors.badge} rounded-full flex items-center justify-center ${colors.text} font-bold text-xs sm:text-sm`}>
+                        {positionNumber}
+                      </div>
+                    </div>
+                    <div className="text-white flex-1 min-w-0">
+                      <div className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">
+                        {groupInfo.name}
+                      </div>
+                      {groupInfo.description && (
+                        <div className="text-xs sm:text-sm opacity-90 truncate mb-1">
+                          {groupInfo.description}
+                        </div>
+                      )}
+                      <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
+                        <div className={`text-xs sm:text-sm font-bold ${colors.medal}`}>
+                          {group.points} Points
+                        </div>
+                       
+                      </div>
+                    </div>
+                    <div className={`${colors.medal} text-lg sm:text-xl md:text-2xl`}>
+                      {colors.medalIcon}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Additional Groups Info */}
+              {result.group.positions.length > 3 && (
+                <div className="text-center mt-4 p-3 bg-white/5 rounded-lg">
+                  <div className="text-xs sm:text-sm text-blue-200">
+                    +{result.group.positions.length - 3} more groups participated
+                  </div>
                 </div>
               )}
             </>
@@ -240,27 +304,34 @@ const Certificate: React.FC<CertificateProps> = ({ result, id }) => {
             🎉 Well Done! 🎉
           </div>
           
-          {/* Certificate Generation Info */}
-          <div className="bg-white/20 rounded-lg p-3 sm:p-4 backdrop-blur-sm">
-            <div className="text-xs sm:text-sm text-blue-100 mb-1">
-              Certificate Generated On
-            </div>
-            <div className="text-sm sm:text-base md:text-lg font-semibold text-white">
-              {new Date(result.createdAt).toLocaleDateString('en-US', { 
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long', 
-                day: 'numeric'
-              })}
-            </div>
-            <div className="text-xs text-blue-100 mt-1">
-              at {new Date(result.createdAt).toLocaleTimeString('en-US', { 
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-              })}
-            </div>
-          </div>
+          
+
+          {/* Points Summary */}
+          {result.group && result.group.positions && result.group.positions.length > 0 && (
+            <div className="bg-white/20 rounded-lg p-3 sm:p-4 backdrop-blur-sm mt-4">
+              <div className="text-xs sm:text-sm text-blue-100 mb-2">Points Distribution</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
+                <div>
+                  <div className="text-xs text-yellow-200">1st Place</div>
+                  <div className="text-sm sm:text-base font-bold text-white">
+                    {result.group.positions[0]?.points || 0} pts
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-200">2nd Place</div>
+                  <div className="text-sm sm:text-base font-bold text-white">
+                    {result.group.positions[1]?.points || 0} pts
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-orange-200">3rd Place</div>
+                  <div className="text-sm sm:text-base font-bold text-white">
+                    {result.group.positions[2]?.points || 0} pts
+                  </div>
+                </div>
+              </div>
+        </div>
+      )}
         </div>
       </div>
 
